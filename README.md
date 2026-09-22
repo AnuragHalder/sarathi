@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sarathi: Gita Counsel (MVP)
 
-## Getting Started
+A mobile-first web app (PWA) where people describe a life problem and get guidance rooted in the Bhagavad Gita, in one of three styles:
 
-First, run the development server:
+1. **Verse & Meaning**: the most relevant shlokas, explained, then applied to the person's situation.
+2. **Arjuna's Parallel**: how Arjuna faced the same confusion and what Krishna told him (narrator voice).
+3. **Direct Counsel**: a conversational reply shaped by the Gita, with no quotes.
+
+## How it works
+
+- `src/data/corpus.ts`: all 701 verses as one-line English translations (~35k tokens). It goes into the system prompt,
+  so the model can choose from the whole Gita (no vector DB needed). It sits at the start of the prompt, so OpenAI's
+  automatic prompt caching makes repeat requests cheaper and faster.
+- The model cites verses as `[[2.47]]`. The UI swaps each tag for a card with the **authentic** Sanskrit, IAST,
+  translation and all commentaries from `public/verse/*.json` and `public/commentary/*.json`. The model never writes
+  scripture text itself, and made-up verse IDs are dropped.
+- Safety: a keyword screen (English/Hindi/Hinglish) flags crisis messages. The UI shows Tele-MANAS 14416, and the
+  prompt switches to putting safety first.
+
+| File | Purpose |
+|---|---|
+| `src/lib/prompts.ts` | System prompt + the 3 style instructions + crisis keywords. **Edit the product's voice here.** |
+| `src/lib/styles.ts` | Style names/descriptions shown in the UI |
+| `src/app/api/chat/route.ts` | Streaming OpenAI endpoint |
+| `src/app/page.tsx` | Chat UI |
+| `src/components/VerseCard.tsx` | Verse card with Hindi toggle + commentary picker |
+| `scripts/build-data.mjs` | Rebuilds all data from the source repo |
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # add your OPENAI_API_KEY
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy (Vercel, ~5 min)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push this repo to GitHub.
+2. On vercel.com, choose **Add New → Project**, import the repo, and keep the defaults.
+3. Under **Environment Variables**, add `OPENAI_API_KEY`.
+4. Deploy. On a phone, open the URL and use **Add to Home Screen** to install it like an app.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Rebuild the verse data
 
-## Learn More
+```bash
+git clone --depth 1 https://github.com/vedicscriptures/bhagavad-gita ../bhagavad-gita
+node scripts/build-data.mjs ../bhagavad-gita
+```
 
-To learn more about Next.js, take a look at the following resources:
+The cleanup drops the 18 chapter colophons and ~1,400 "did not comment" placeholders, fixes the IAST avagraha
+(`saṅgo.astv` → `saṅgo'stv`) and strips verse-number prefixes.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Content & licensing (before public launch)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Verse data comes from [vedicscriptures/bhagavad-gita](https://github.com/vedicscriptures/bhagavad-gita) (GPL-3.0).
+Several bundled translations and commentaries (e.g. Prabhupada/BBT, Gambirananda/Advaita Ashrama, Chinmayananda,
+Ramsukhdas/Gita Press, Sivananda/DLS) are copyrighted by their publishers. The MVP includes everything for a
+private beta. Review permissions (and the GPL implications) before a public launch.
 
-## Deploy on Vercel
+## Known limitations / next steps
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Chats are not saved (refreshing clears them). Next: local history, then accounts.
+- Crisis detection is keyword-based. Next: add OpenAI's moderation endpoint (self-harm categories).
+- No rate limiting yet. Add one (e.g. Vercel KV / Upstash) before sharing the link publicly.

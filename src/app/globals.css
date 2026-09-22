@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #fbf6ec;
+  --surface: #fffdf8;
+  --surface-2: #f5ecdb;
+  --ink: #2b2118;
+  --muted: #7a6a58;
+  --line: #e8dcc6;
+  --accent: #c2410c;
+  --accent-soft: #fde7d3;
+  --gold: #b7791f;
+  --danger-bg: #fef2f2;
+  --danger-ink: #991b1b;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #17120d;
+    --surface: #211a13;
+    --surface-2: #2c2319;
+    --ink: #f3e9da;
+    --muted: #b3a28c;
+    --line: #3b2f22;
+    --accent: #fb923c;
+    --accent-soft: #3a2413;
+    --gold: #e0b35a;
+    --danger-bg: #3a1414;
+    --danger-ink: #fecaca;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-gold: var(--gold);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-ink: var(--danger-ink);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-fraunces);
+  --font-deva: var(--font-deva), var(--font-fraunces);
 }
+
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: var(--font-inter), system-ui, sans-serif; }
+
+.prose-reply p { margin: 0.55em 0; line-height: 1.65; }
+.prose-reply ul, .prose-reply ol { margin: 0.5em 0; padding-left: 1.3em; }
+.prose-reply ul { list-style: disc; }
+.prose-reply ol { list-style: decimal; }
+.prose-reply li { margin: 0.25em 0; line-height: 1.6; }
+.prose-reply h1, .prose-reply h2, .prose-reply h3 {
+  font-family: var(--font-fraunces), serif; font-weight: 600; margin: 0.9em 0 0.3em; font-size: 1.05rem; color: var(--accent);
+}
+.prose-reply strong { font-weight: 600; }
+.prose-reply > :first-child { margin-top: 0; }
