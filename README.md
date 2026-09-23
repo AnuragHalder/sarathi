@@ -47,6 +47,12 @@ The report shows distinct verses cited, % of replies citing chapter 1, banned-ph
 | `src/components/VerseCard.tsx` | Verse card with Hindi toggle + commentary picker |
 | `scripts/build-data.mjs` | Rebuilds all data from the source repo |
 
+## Background music
+
+Put an MP3 at `public/audio/calm.mp3`. It loops quietly (30% volume, 2.5 s fade-in). Browsers only allow sound
+after the visitor's first tap, click or keypress, so the music starts then. The speaker button in the header opens
+**Mute** and a **volume slider**, and the choice is remembered on that device. If the file is missing, the button is hidden.
+
 ## Run locally
 
 ```bash

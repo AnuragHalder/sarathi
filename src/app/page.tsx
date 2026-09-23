@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Reply from "@/components/Reply";
+import AmbientAudio from "@/components/AmbientAudio";
 import { STYLES, type Style } from "@/lib/styles";
 
 type Msg = { role: "user" | "assistant"; content: string; style?: Style; crisis?: boolean };
@@ -106,14 +107,17 @@ export default function Home() {
             <div className="text-xs text-muted">Guidance from the Bhagavad Gita</div>
           </div>
         </button>
-        {!empty && (
-          <button
-            onClick={() => setMessages([])}
-            className="rounded-full border border-line px-3 py-1 text-sm text-muted hover:text-ink"
-          >
-            New chat
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {!empty && (
+            <button
+              onClick={() => setMessages([])}
+              className="rounded-full border border-line px-3 py-1 text-sm text-muted hover:text-ink"
+            >
+              New chat
+            </button>
+          )}
+          <AmbientAudio />
+        </div>
       </header>
 
       <main className="flex-1 px-4 pb-4">
@@ -236,7 +240,7 @@ export default function Home() {
           <a href="tel:14416" className="underline">
             14416
           </a>{" "}
-          (24x7, free). <span className="opacity-60">· v2.1</span>
+          (24x7, free). <span className="opacity-60">· v2.2</span>
         </p>
       </footer>
     </div>
