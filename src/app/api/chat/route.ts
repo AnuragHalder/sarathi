@@ -1,16 +1,14 @@
 import OpenAI from "openai";
-import { isCrisis, systemPrompt, type Style } from "@/lib/prompts";
+import { COUNSELLOR_STATIC, CRISIS_NOTE, isCrisis, type Style } from "@/lib/prompts";
+import { buildContext, createWithFallback, MODEL, readSituation, type Msg, type Situation } from "@/lib/counsel";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-type Msg = { role: "user" | "assistant"; content: string };
 const STYLES: Style[] = ["verse", "arjuna", "direct"];
-const MODEL = process.env.OPENAI_MODEL || "gpt-5-mini";
-const EFFORT = process.env.OPENAI_REASONING_EFFORT ?? (/^(gpt-5|o\d)/.test(MODEL) ? "low" : "");
 
 export async function POST(req: Request) {
-  let body: { messages?: Msg[]; style?: Style };
+  let body: { messages?: Msg[]; style?: Style; model?: string };
   try {
     body = await req.json();
   } catch {
@@ -28,29 +26,52 @@ export async function POST(req: Request) {
   if (!process.env.OPENAI_API_KEY) {
     return Response.json({ error: "OPENAI_API_KEY is not set on the server." }, { status: 500 });
   }
+  // Model override is for the eval script only (never enable in production).
+  const model = process.env.ALLOW_MODEL_OVERRIDE === "1" && body.model ? body.model : MODEL;
 
   const crisis = isCrisis(last.content);
   const client = new OpenAI();
+  const history = messages.slice(0, -1);
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async start(controller) {
-      // First line is a small JSON header the client reads before the text.
-      controller.enqueue(encoder.encode(JSON.stringify({ crisis }) + "\n"));
       try {
-        const completion = await client.chat.completions.create({
-          model: MODEL,
+        // Step 1: read the situation (skipped in a crisis: no delay, no clarifying questions).
+        let sit: Situation;
+        if (crisis) {
+          sit = { themes: ["despair"], arjuna_moment: null, intensity: "high", needs_clarification: false, missing: "", source: "fallback" };
+        } else {
+          sit = await readSituation(client, history, last.content);
+        }
+        // Ask clarifying questions at most once per chat: only on the first message.
+        if (history.some((m) => m.role === "assistant")) sit.needs_clarification = false;
+
+        // Step 2: shortlist + context.
+        const ctx = buildContext(style, sit, history, crisis);
+
+        // First line is a small JSON header the client reads before the text.
+        controller.enqueue(
+          encoder.encode(JSON.stringify({ crisis, themes: sit.themes, moment: sit.arjuna_moment, clarify: sit.needs_clarification, shortlist: ctx.shortlist, reader: sit.source, model }) + "\n"),
+        );
+
+        // Step 3: counsellor reply. Static prompt first (cached), then the per-message context.
+        const system: OpenAI.ChatCompletionMessageParam[] = [
+          { role: "system", content: COUNSELLOR_STATIC },
+          { role: "system", content: `CONTEXT FOR THIS REPLY:\n${ctx.text}` + (crisis ? `\n\n${CRISIS_NOTE}` : "") },
+        ];
+        const completion = (await createWithFallback(client, {
+          model,
           stream: true,
-          messages: [{ role: "system", content: systemPrompt(style, crisis) }, ...messages],
-          ...(EFFORT ? { reasoning_effort: EFFORT as "low" } : {}),
-        });
+          messages: [...system, ...messages],
+        })) as AsyncIterable<OpenAI.ChatCompletionChunk>;
         for await (const chunk of completion) {
           const t = chunk.choices[0]?.delta?.content;
           if (t) controller.enqueue(encoder.encode(t));
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Unknown error";
-        console.error("OpenAI error:", msg);
+        console.error("Chat error:", msg);
         controller.enqueue(encoder.encode(`\n\n_Sorry, something went wrong reaching the AI service. Please try again._`));
       } finally {
         controller.close();

@@ -6,7 +6,28 @@ A mobile-first web app (PWA) where people describe a life problem and get guidan
 2. **Arjuna's Parallel**: how Arjuna faced the same confusion and what Krishna told him (narrator voice).
 3. **Direct Counsel**: a conversational reply shaped by the Gita, with no quotes.
 
-## How it works
+## How it works (prompt v2)
+
+Each message goes through two steps:
+
+1. **Situation reader** (`src/lib/counsel.ts`, cheap model, JSON): picks 1–3 themes from the hand-built
+   theme index, the matching "Arjuna moment", intensity, and whether the message is too vague to answer
+   (then Sarathi asks 1–2 questions first, at most once per chat). If this step fails, a keyword fallback is used.
+2. **Counsellor**: gets the whole Gita (cached) plus a shortlist of ~15 verses for those themes, with
+   commentary excerpts from Shankara, Ramanuja, Sivananda and others, minus verses already cited.
+
+`src/lib/themes.ts` holds the 40 themes and 17 Arjuna moments; `src/lib/prompts.ts` holds both prompts.
+
+### Measuring quality
+
+```bash
+ALLOW_MODEL_OVERRIDE=1 npm run dev            # terminal 1 (needs OPENAI_API_KEY in .env.local)
+EVAL_MODELS=gpt-5.4-mini,gpt-5.6-luna npm run eval   # terminal 2 → eval-report.html
+```
+
+The report shows distinct verses cited, % of replies citing chapter 1, banned-phrase count, and every reply side by side.
+
+## How it worked in v1
 
 - `src/data/corpus.ts`: all 701 verses as one-line English translations (~35k tokens). It goes into the system prompt,
   so the model can choose from the whole Gita (no vector DB needed). It sits at the start of the prompt, so OpenAI's
@@ -49,7 +70,8 @@ node scripts/build-data.mjs ../bhagavad-gita
 ```
 
 The cleanup drops the 18 chapter colophons and ~1,400 "did not comment" placeholders, fixes the IAST avagraha
-(`saṅgo.astv` → `saṅgo'stv`) and strips verse-number prefixes.
+(`saṅgo.astv` → `saṅgo'stv`), strips verse-number prefixes and translator notes, restores the "qu" the source
+lost in ~150 English words ("eanimity" → "equanimity"), and skips copy-error translations (e.g. 18.45).
 
 ## Content & licensing (before public launch)
 
