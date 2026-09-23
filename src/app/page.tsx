@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Reply from "@/components/Reply";
 import AmbientAudio from "@/components/AmbientAudio";
+import Welcome from "@/components/Welcome";
 import { STYLES, type Style } from "@/lib/styles";
 
 type Msg = { role: "user" | "assistant"; content: string; style?: Style; crisis?: boolean };
@@ -98,6 +99,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col">
+      <Welcome />
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-bg/90 px-4 py-3 backdrop-blur">
         <button onClick={() => setMessages([])} className="flex items-center gap-2" aria-label="New conversation">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -240,7 +242,7 @@ export default function Home() {
           <a href="tel:14416" className="underline">
             14416
           </a>{" "}
-          (24x7, free). <span className="opacity-60">· v2.2</span>
+          (24x7, free). <span className="opacity-60">· v2.3</span>
         </p>
       </footer>
     </div>

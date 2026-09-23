@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BEGIN_EVENT } from "./Welcome";
 
 /** Background music file. Replace public/audio/calm.mp3 to change the track. */
 const SRC = "/audio/calm.mp3";
@@ -152,6 +153,17 @@ export default function AmbientAudio() {
       });
     }
 
+    // Choice from the first-visit welcome screen ("Begin" or "Continue without sound").
+    const onBegin = (e: Event) => {
+      const music = (e as CustomEvent<{ music: boolean }>).detail?.music !== false;
+      wantOnRef.current = music;
+      setOn(music);
+      writePref({ on: music, volume: volRef.current });
+      if (music) start(true).then((ok) => ok && removeGesture());
+      else removeGesture();
+    };
+    window.addEventListener(BEGIN_EVENT, onBegin);
+
     // Pause when the app is in the background; resume when it comes back.
     const onVis = () => {
       if (document.hidden) a.pause();
@@ -161,6 +173,7 @@ export default function AmbientAudio() {
 
     return () => {
       removeGesture();
+      window.removeEventListener(BEGIN_EVENT, onBegin);
       document.removeEventListener("visibilitychange", onVis);
       a.pause();
       ctxRef.current?.close().catch(() => {});
@@ -204,15 +217,20 @@ export default function AmbientAudio() {
 
   if (!available) return null;
 
-  const muted = !on || !playing || volume === 0;
+  const muted = !on || volume === 0;
+  const waiting = on && !playing && volume > 0;
 
   return (
     <div ref={boxRef} className="relative" data-music-control>
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label={muted ? "Music is off. Open music controls" : "Music is playing. Open music controls"}
+        aria-label={
+          muted ? "Music is off. Open music controls" : waiting ? "Music starts when you tap. Open music controls" : "Music is playing. Open music controls"
+        }
         aria-expanded={open}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted hover:text-ink"
+        className={`flex h-9 w-9 items-center justify-center rounded-full border border-line hover:text-ink ${
+          waiting ? "animate-pulse text-accent" : muted ? "text-muted" : "text-accent"
+        }`}
       >
         <SpeakerIcon muted={muted} />
       </button>
