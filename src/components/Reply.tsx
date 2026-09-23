@@ -21,6 +21,20 @@ export default function Reply({ text, streaming }: { text: string; streaming?: b
   }
   parts.push({ kind: "md", value: clean.slice(last) });
 
+  // If the model put a tag mid-sentence ("…unchangeable [[2.11]]. And…"), the punctuation after the
+  // card would start a new line on its own. Move it back to the end of the text before the card.
+  for (let i = 1; i < parts.length - 1; i++) {
+    if (parts[i].kind !== "verse") continue;
+    const next = parts[i + 1];
+    const prev = parts[i - 1];
+    if (next?.kind !== "md" || prev?.kind !== "md") continue;
+    // punctuation right after the card, possibly on its own line (never a "- " list marker)
+    const m = next.value.match(/^\s*([.,;:!?)]+)[ \t]*(?=\s|$)/);
+    if (!m) continue;
+    next.value = next.value.slice(m[0].length);
+    if (!/[.,;:!?]\s*$/.test(prev.value)) prev.value = prev.value.replace(/\s*$/, m[1]);
+  }
+
   return (
     <div className="prose-reply">
       {parts.map((p, i) =>

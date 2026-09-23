@@ -236,7 +236,7 @@ export default function Home() {
           <a href="tel:14416" className="underline">
             14416
           </a>{" "}
-          (24x7, free).
+          (24x7, free). <span className="opacity-60">· v2.1</span>
         </p>
       </footer>
     </div>
