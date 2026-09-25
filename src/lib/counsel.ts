@@ -16,8 +16,8 @@ export type Situation = {
   source: "reader" | "fallback";
 };
 
-export const MODEL = process.env.OPENAI_MODEL || "gpt-5.4-mini";
-export const READER_MODEL = process.env.OPENAI_READER_MODEL || "gpt-5.6-luna";
+export const MODEL = process.env.OPENAI_MODEL || "gpt-6-luna";
+export const READER_MODEL = process.env.OPENAI_READER_MODEL || "gpt-6-luna";
 const EFFORT = process.env.OPENAI_REASONING_EFFORT ?? "low";
 
 const VERSE = new Map(verses.map((v) => [v.id, v]));
@@ -83,7 +83,7 @@ export async function readSituation(client: OpenAI, history: Msg[], latest: stri
 }
 
 /** Per-message context block (not cached): situation, Arjuna moment, verse shortlist with commentary. */
-export function buildContext(style: Style, sit: Situation, history: Msg[], crisis: boolean) {
+export function buildContext(style: Style, sit: Situation, history: Msg[], crisis: boolean, memory = "") {
   const cited = citedIn(history.filter((m) => m.role === "assistant").map((m) => m.content));
   const moment = getMoment(sit.arjuna_moment);
   // Only the Arjuna style pulls in the moment's answer verses; with no clear moment we never force chapter 1.
@@ -121,6 +121,7 @@ export function buildContext(style: Style, sit: Situation, history: Msg[], crisi
       }
     });
   }
+  if (memory && !crisis) lines.push(memory);
   if (crisis) lines.push(`CRISIS: true`);
   return { text: lines.join("\n"), shortlist, cited: [...cited] };
 }

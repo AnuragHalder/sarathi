@@ -46,6 +46,20 @@ The report shows distinct verses cited, % of replies citing chapter 1, banned-ph
 | `src/app/page.tsx` | Chat UI |
 | `src/components/VerseCard.tsx` | Verse card with Hindi toggle + commentary picker |
 | `scripts/build-data.mjs` | Rebuilds all data from the source repo |
+| `src/lib/memory.ts` | Memory checkpoints (writing notes) and loading them into replies |
+| `supabase/schema.sql` | Database tables + security rules |
+
+## Accounts, chat history and memory (v3)
+
+- **Google sign-in** via Supabase. Guests get 3 free conversations (kept in their browser); on sign-in they move into the account.
+- **Side panel** with every past conversation: open, continue, delete (deleting also forgets memory notes that came only from that chat).
+- **Memory**: after the 2nd message of a conversation and every 4 after, a background call (`src/lib/memory.ts`)
+  updates short notes about the person (situations, context, goals, patterns, what helped, preferences) and a
+  one-line summary of the chat. New replies get those notes plus recent summaries in their context.
+- **Controls**: first sign-in shows a consent + 18+ screen with a memory choice. `/memory` lists every note
+  (forget one, forget all, memory on/off, delete account). `/privacy` is a draft privacy policy (review it!).
+- Database: run `supabase/schema.sql` once in the Supabase SQL editor. Row-level security means each user can only read their own rows.
+- Without the two `NEXT_PUBLIC_SUPABASE_*` variables the app still works, guest-only.
 
 ## Background music
 
