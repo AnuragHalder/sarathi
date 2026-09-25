@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   title: "Sarathi: Gita Counsel",
   description: "Guidance for life's battles, from the Bhagavad Gita.",
   appleWebApp: { capable: true, title: "Sarathi", statusBarStyle: "default" },
+  // Google Search Console ownership check: set GOOGLE_SITE_VERIFICATION in Vercel to the code from the meta tag.
+  ...(process.env.GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } } : {}),
 };
 
 export const viewport: Viewport = {

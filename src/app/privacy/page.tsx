@@ -3,9 +3,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Privacy policy · Sarathi" };
 
-// DRAFT: have this reviewed (ideally by a lawyer familiar with India's DPDP Act) and fill in the
-// contact details before publishing the app to everyone.
-const CONTACT_EMAIL = "privacy@example.com"; // TODO: replace with your real contact email
+// Have this reviewed (ideally by a lawyer familiar with India's DPDP Act) as the app grows.
+const CONTACT_EMAIL = "anurag.economics@gmail.com";
 const UPDATED = "25 September 2026";
 
 export default function Privacy() {

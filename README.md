@@ -60,6 +60,7 @@ The report shows distinct verses cited, % of replies citing chapter 1, banned-ph
   (forget one, forget all, memory on/off, delete account). `/privacy` is a draft privacy policy (review it!).
 - Database: run `supabase/schema.sql` once in the Supabase SQL editor. Row-level security means each user can only read their own rows.
 - Without the two `NEXT_PUBLIC_SUPABASE_*` variables the app still works, guest-only.
+- **Usage limits** (server-side): 15 messages/day per guest IP, 60/day per signed-in user (`RATE_LIMIT_GUEST`, `RATE_LIMIT_USER`). Needs `supabase/002_rate_limit.sql` run once.
 
 ## Background music
 
