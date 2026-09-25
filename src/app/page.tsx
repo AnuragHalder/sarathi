@@ -203,6 +203,7 @@ export default function Home() {
       });
       if (!res.ok || !res.body) {
         const err = await res.json().catch(() => ({}));
+        if (res.status === 429 && err.guest && auth.enabled) setAskSignIn(true);
         throw new Error(err.error || `Request failed (${res.status})`);
       }
       const reader = res.body.getReader();
@@ -447,7 +448,11 @@ export default function Home() {
             <a href="tel:14416" className="underline">
               14416
             </a>{" "}
-            (24x7, free). <span className="opacity-60">· v3.0</span>
+            (24x7, free). ·{" "}
+            <a href="/privacy" className="underline">
+              Privacy
+            </a>{" "}
+            <span className="opacity-60">· v3.1</span>
           </p>
         </footer>
       </div>

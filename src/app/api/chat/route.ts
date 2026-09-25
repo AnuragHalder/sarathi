@@ -5,6 +5,7 @@ import { buildContext, createWithFallback, MODEL, readSituation, type Msg, type 
 import { getServerSupabase, getUserId } from "@/lib/supabase/server";
 import { isCheckpointTurn, loadMemoryContext, runCheckpoint } from "@/lib/memory";
 import { titleFrom } from "@/lib/guest";
+import { allowRequest, GUEST_DAILY, USER_DAILY } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -41,6 +42,19 @@ export async function POST(req: Request) {
   // ---- Signed-in users: find or create the conversation and save the user's message.
   const supabase = await getServerSupabase();
   const userId = supabase ? await getUserId(supabase) : null;
+  // Daily usage limit (server-side, so it can't be bypassed by clearing the browser).
+  if (!(await allowRequest(req, supabase, userId))) {
+    return Response.json(
+      {
+        error: userId
+          ? `You've reached today's limit of ${USER_DAILY} messages. Sarathi will be ready for you again tomorrow.`
+          : `You've reached today's guest limit of ${GUEST_DAILY} messages. Sign in (free) to keep talking.`,
+        limit: true,
+        guest: !userId,
+      },
+      { status: 429 },
+    );
+  }
   let conversationId: string | null = null;
   let userTurns = 0;
   let lastCheckpoint = 0;

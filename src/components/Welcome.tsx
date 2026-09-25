@@ -62,6 +62,12 @@ export default function Welcome() {
         <button onClick={() => enter(false)} className="mt-4 text-sm text-muted underline-offset-4 hover:underline">
           Continue without sound
         </button>
+        <p className="mt-10 text-xs text-muted">
+          Reflections inspired by the Bhagavad Gita, not professional advice.{" "}
+          <a href="/privacy" className="underline">
+            Privacy policy
+          </a>
+        </p>
       </div>
     </div>
   );
