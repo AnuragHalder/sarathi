@@ -285,7 +285,7 @@ export default function Home() {
       />
 
       <div className="mx-auto flex min-h-dvh w-full min-w-0 max-w-2xl flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-line bg-bg/90 px-4 py-3 backdrop-blur">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-line bg-bg/55 px-4 py-3 backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -376,7 +376,7 @@ export default function Home() {
               {messages.map((m, i) =>
                 m.role === "user" ? (
                   <div key={i} className="flex justify-end">
-                    <p className="max-w-[85%] rounded-2xl rounded-br-md bg-accent px-4 py-2.5 whitespace-pre-wrap text-white dark:text-[#1b120a]">
+                    <p className="max-w-[85%] rounded-2xl rounded-br-md bg-accent px-4 py-2.5 whitespace-pre-wrap text-[#1b120a]">
                       {m.content}
                     </p>
                   </div>
@@ -397,7 +397,7 @@ export default function Home() {
           )}
         </main>
 
-        <footer className="sticky bottom-0 border-t border-line bg-bg/95 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
+        <footer className="sticky bottom-0 border-t border-line bg-bg/85 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
           <div className="mb-2 flex gap-1 overflow-x-auto text-xs" role="radiogroup" aria-label="Guidance style">
             {(Object.keys(STYLES) as Style[]).map((k) => (
               <button
@@ -438,7 +438,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={busy || !input.trim()}
-              className="h-11 rounded-2xl bg-accent px-4 font-medium text-white disabled:opacity-40 dark:text-[#1b120a]"
+              className="h-11 rounded-2xl bg-accent px-4 font-medium text-[#1b120a] disabled:opacity-40"
             >
               Ask
             </button>
@@ -452,7 +452,7 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.1</span>
+            <span className="opacity-60">· v3.2</span>
           </p>
         </footer>
       </div>

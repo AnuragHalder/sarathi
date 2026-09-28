@@ -1,32 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fbf6ec;
-  --surface: #fffdf8;
-  --surface-2: #f5ecdb;
-  --ink: #2b2118;
-  --muted: #7a6a58;
-  --line: #e8dcc6;
-  --accent: #c2410c;
-  --accent-soft: #fde7d3;
-  --gold: #b7791f;
-  --danger-bg: #fef2f2;
-  --danger-ink: #991b1b;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17120d;
-    --surface: #211a13;
-    --surface-2: #2c2319;
-    --ink: #f3e9da;
-    --muted: #b3a28c;
-    --line: #3b2f22;
-    --accent: #fb923c;
-    --accent-soft: #3a2413;
-    --gold: #e0b35a;
-    --danger-bg: #3a1414;
-    --danger-ink: #fecaca;
-  }
+  /* One cosmic night palette, always: a deep indigo-black sky with saffron and gold light. */
+  color-scheme: dark;
+  --bg: #080611;
+  --surface: rgba(28, 21, 40, 0.8);
+  --surface-2: rgba(44, 33, 58, 0.82);
+  --ink: #f4ead9;
+  --muted: #b9aa92;
+  --line: rgba(224, 179, 90, 0.2);
+  --accent: #fb923c;
+  --accent-soft: rgba(251, 146, 60, 0.16);
+  --gold: #e0b35a;
+  --danger-bg: #3a1414;
+  --danger-ink: #fecaca;
 }
 
 @theme inline {
@@ -46,7 +33,9 @@
   --font-deva: var(--font-deva), var(--font-fraunces);
 }
 
-html, body { background: var(--bg); color: var(--ink); }
+html { background: var(--bg); color: var(--ink); }
+/* Transparent so the fixed cosmic backdrop (behind everything) shows through. */
+body { background: transparent; color: var(--ink); }
 body { font-family: var(--font-inter), system-ui, sans-serif; }
 
 .prose-reply p { margin: 0.55em 0; line-height: 1.65; }
@@ -59,3 +48,45 @@ body { font-family: var(--font-inter), system-ui, sans-serif; }
 }
 .prose-reply strong { font-weight: 600; }
 .prose-reply > :first-child { margin-top: 0; }
+
+/* ---------- Cosmic backdrop (see CosmicBackground.tsx) ---------- */
+.cosmos {
+  position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 110%, #1a1030 0%, transparent 60%),
+    radial-gradient(ellipse 90% 70% at 50% -10%, #120c24 0%, transparent 65%),
+    #080611;
+}
+.nebula { position: absolute; border-radius: 50%; will-change: transform; }
+.nebula-a {
+  width: 80vmax; height: 80vmax; left: -30vmax; top: -35vmax;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.22) 0%, rgba(194, 65, 12, 0.1) 35%, transparent 65%);
+  animation: nebula-drift-a 140s ease-in-out infinite alternate;
+}
+.nebula-b {
+  width: 70vmax; height: 70vmax; right: -30vmax; bottom: -30vmax;
+  background: radial-gradient(circle, rgba(224, 179, 90, 0.18) 0%, rgba(183, 121, 31, 0.08) 38%, transparent 65%);
+  animation: nebula-drift-b 170s ease-in-out infinite alternate;
+}
+.nebula-c {
+  width: 60vmax; height: 60vmax; right: -15vmax; top: -20vmax;
+  background: radial-gradient(circle, rgba(129, 90, 200, 0.16) 0%, rgba(76, 50, 140, 0.07) 40%, transparent 68%);
+  animation: nebula-drift-c 200s ease-in-out infinite alternate;
+}
+/* A faint band of starlight across the sky, like the Milky Way. */
+.galaxy-band {
+  position: absolute; left: -25%; top: 38%; width: 150%; height: 26vmax;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 232, 190, 0.07) 0%, rgba(224, 179, 90, 0.035) 45%, transparent 75%);
+  transform: rotate(-24deg);
+}
+/* Darkens the edges slightly so the centre, where people read, stays calm. */
+.cosmos-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 55%, rgba(4, 3, 9, 0.55) 100%);
+}
+@keyframes nebula-drift-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(8vmax, 6vmax) scale(1.12); } }
+@keyframes nebula-drift-b { from { transform: translate(0, 0) scale(1.05); } to { transform: translate(-7vmax, -5vmax) scale(0.95); } }
+@keyframes nebula-drift-c { from { transform: translate(0, 0) scale(0.95); } to { transform: translate(-5vmax, 7vmax) scale(1.1); } }
+@media (prefers-reduced-motion: reduce) {
+  .nebula { animation: none; }
+}

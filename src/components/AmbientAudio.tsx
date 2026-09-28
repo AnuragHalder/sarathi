@@ -235,7 +235,7 @@ export default function AmbientAudio() {
         <SpeakerIcon muted={muted} />
       </button>
       {open && (
-        <div className="absolute right-0 top-11 z-20 w-60 rounded-2xl border border-line bg-surface p-4 shadow-lg">
+        <div className="absolute right-0 top-11 z-20 w-60 rounded-2xl border border-line bg-surface p-4 shadow-lg backdrop-blur-md">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Calming music</span>
             <button
