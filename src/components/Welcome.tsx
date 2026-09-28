@@ -44,7 +44,7 @@ export default function Welcome() {
     >
       {/* Its own sky, so the welcome screen fully covers the app behind it. */}
       <CosmicBackground />
-      <div className="w-full max-w-sm text-center">
+      <div className="w-full max-w-sm text-center [text-shadow:0_1px_3px_rgba(1,10,15,0.9),0_0_12px_rgba(1,10,15,0.6)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icon-192.png" alt="" className="mx-auto h-16 w-16 rounded-full" />
         <h1 id="welcome-title" className="mt-5 font-serif text-3xl font-semibold">

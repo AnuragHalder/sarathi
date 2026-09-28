@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  /* One cosmic night palette, always: a deep indigo-black sky with saffron and gold light. */
+  /* "Swarna Mandala": deep peacock teal with gold. Text colours are chosen to stay clearly readable over it. */
   color-scheme: dark;
-  --bg: #080611;
-  --surface: rgba(28, 21, 40, 0.8);
-  --surface-2: rgba(44, 33, 58, 0.82);
-  --ink: #f4ead9;
-  --muted: #b9aa92;
-  --line: rgba(224, 179, 90, 0.2);
-  --accent: #fb923c;
-  --accent-soft: rgba(251, 146, 60, 0.16);
-  --gold: #e0b35a;
+  --bg: #03171f;
+  --surface: rgba(3, 20, 28, 0.78);
+  --surface-2: rgba(8, 36, 46, 0.85);
+  --ink: #fbf3de;
+  --muted: #d7cbb1;
+  --line: rgba(217, 180, 90, 0.3);
+  --accent: #e2bd62;
+  --accent-soft: rgba(46, 44, 26, 0.88);
+  --gold: #ecc977;
   --danger-bg: #3a1414;
   --danger-ink: #fecaca;
 }
@@ -49,44 +49,32 @@ body { font-family: var(--font-inter), system-ui, sans-serif; }
 .prose-reply strong { font-weight: 600; }
 .prose-reply > :first-child { margin-top: 0; }
 
-/* ---------- Cosmic backdrop (see CosmicBackground.tsx) ---------- */
+/* ---------- Mandala backdrop (see CosmicBackground.tsx) ---------- */
 .cosmos {
   position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none;
-  background:
-    radial-gradient(ellipse 120% 90% at 50% 110%, #1a1030 0%, transparent 60%),
-    radial-gradient(ellipse 90% 70% at 50% -10%, #120c24 0%, transparent 65%),
-    #080611;
+  background: radial-gradient(ellipse 90% 65% at 50% 42%, #0a4a55 0%, #06303d 40%, #03171f 75%, #010a0f 100%);
 }
-.nebula { position: absolute; border-radius: 50%; will-change: transform; }
-.nebula-a {
-  width: 80vmax; height: 80vmax; left: -30vmax; top: -35vmax;
-  background: radial-gradient(circle, rgba(251, 146, 60, 0.22) 0%, rgba(194, 65, 12, 0.1) 35%, transparent 65%);
-  animation: nebula-drift-a 140s ease-in-out infinite alternate;
+.cosmos-layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* Sized to the screen: about 1.5x the width on a phone, a little taller than the window on a laptop. */
+.mandala {
+  position: absolute; left: 50%; top: 42%; width: min(150vw, 115vh); height: min(150vw, 115vh);
+  transform: translate(-50%, -50%); opacity: 0.42;
 }
-.nebula-b {
-  width: 70vmax; height: 70vmax; right: -30vmax; bottom: -30vmax;
-  background: radial-gradient(circle, rgba(224, 179, 90, 0.18) 0%, rgba(183, 121, 31, 0.08) 38%, transparent 65%);
-  animation: nebula-drift-b 170s ease-in-out infinite alternate;
-}
-.nebula-c {
-  width: 60vmax; height: 60vmax; right: -15vmax; top: -20vmax;
-  background: radial-gradient(circle, rgba(129, 90, 200, 0.16) 0%, rgba(76, 50, 140, 0.07) 40%, transparent 68%);
-  animation: nebula-drift-c 200s ease-in-out infinite alternate;
-}
-/* A faint band of starlight across the sky, like the Milky Way. */
-.galaxy-band {
-  position: absolute; left: -25%; top: 38%; width: 150%; height: 26vmax;
-  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 232, 190, 0.07) 0%, rgba(224, 179, 90, 0.035) 45%, transparent 75%);
-  transform: rotate(-24deg);
-}
-/* Darkens the edges slightly so the centre, where people read, stays calm. */
-.cosmos-vignette {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 55%, rgba(4, 3, 9, 0.55) 100%);
-}
-@keyframes nebula-drift-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(8vmax, 6vmax) scale(1.12); } }
-@keyframes nebula-drift-b { from { transform: translate(0, 0) scale(1.05); } to { transform: translate(-7vmax, -5vmax) scale(0.95); } }
-@keyframes nebula-drift-c { from { transform: translate(0, 0) scale(0.95); } to { transform: translate(-5vmax, 7vmax) scale(1.1); } }
+.mandala .spin { transform-box: fill-box; transform-origin: 50% 50%; animation: mandala-turn 240s linear infinite; }
+.mandala .spin-rev { animation-direction: reverse; animation-duration: 320s; }
+.mandala .mandala-eyes { opacity: 0.9; }
+@keyframes mandala-turn { to { transform: rotate(360deg); } }
+.twinkle { animation: twinkle 5s ease-in-out infinite alternate; opacity: 0.6; }
+@keyframes twinkle { from { opacity: 0.15; } to { opacity: 0.9; } }
+.dust { animation: dust-rise 24s linear infinite; opacity: 0; }
+@keyframes dust-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 0.9; } 85% { opacity: 0.7; } 100% { transform: translateY(-320px); opacity: 0; } }
+/* Darkens the edges so the eye rests on the centre. */
+.cosmos-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 45%, rgba(1, 10, 15, 0.7) 100%); }
 @media (prefers-reduced-motion: reduce) {
-  .nebula { animation: none; }
+  .mandala .spin, .twinkle, .dust { animation: none; }
+  .dust { opacity: 0.6; }
 }
+
+/* Readability over the gold lines: a soft dark halo behind text on the page itself. */
+main { text-shadow: 0 1px 3px rgba(1, 10, 15, 0.9), 0 0 12px rgba(1, 10, 15, 0.55); }
+main button, main textarea, main input, .bg-accent, .bg-surface, .bg-surface-2 { text-shadow: none; }
