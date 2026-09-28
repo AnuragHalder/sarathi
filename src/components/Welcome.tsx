@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import CosmicBackground from "./CosmicBackground";
 
 const SEEN_KEY = "sarathi-welcomed";
 
@@ -39,8 +40,10 @@ export default function Welcome() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="welcome-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-bg px-6"
+      className="fixed inset-0 z-50 flex items-center justify-center px-6"
     >
+      {/* Its own sky, so the welcome screen fully covers the app behind it. */}
+      <CosmicBackground />
       <div className="w-full max-w-sm text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icon-192.png" alt="" className="mx-auto h-16 w-16 rounded-full" />
@@ -55,7 +58,7 @@ export default function Welcome() {
         <button
           onClick={() => enter(true)}
           autoFocus
-          className="mt-10 w-full rounded-2xl bg-accent px-6 py-3.5 text-lg font-medium text-white outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 dark:text-[#1b120a]"
+          className="mt-10 w-full rounded-2xl bg-accent px-6 py-3.5 text-lg font-medium text-[#1b120a] outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
         >
           Begin
         </button>

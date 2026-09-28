@@ -7,7 +7,7 @@ import { GoogleButton } from "./Sidebar";
 function Shell({ children, label }: { children: React.ReactNode; label: string }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center" role="dialog" aria-modal="true" aria-label={label}>
-      <div className="w-full max-w-md rounded-3xl border border-line bg-surface p-6 shadow-xl">{children}</div>
+      <div className="w-full max-w-md rounded-3xl border border-line bg-surface p-6 shadow-xl backdrop-blur-md">{children}</div>
     </div>
   );
 }
@@ -75,7 +75,7 @@ export function ConsentDialog({
           await onAccept(memory);
           setSaving(false);
         }}
-        className="mt-5 w-full rounded-xl bg-accent px-4 py-3 font-medium text-white disabled:opacity-40 dark:text-[#1b120a]"
+        className="mt-5 w-full rounded-xl bg-accent px-4 py-3 font-medium text-[#1b120a] disabled:opacity-40"
       >
         {saving ? "Saving…" : "Agree and continue"}
       </button>

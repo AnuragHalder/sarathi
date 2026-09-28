@@ -49,7 +49,7 @@ export default function Sidebar(p: Props) {
       <div className="px-3">
         <button
           onClick={p.onNew}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-3 py-2.5 text-sm font-medium text-white dark:text-[#1b120a]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-3 py-2.5 text-sm font-medium text-[#1b120a]"
         >
           <span aria-hidden="true">＋</span> New conversation
         </button>
@@ -147,14 +147,14 @@ export default function Sidebar(p: Props) {
   return (
     <>
       {/* Desktop column */}
-      <aside className="hidden w-72 shrink-0 border-r border-line bg-bg lg:block">
+      <aside className="hidden w-72 shrink-0 border-r border-line bg-bg/45 backdrop-blur-md lg:block">
         <div className="sticky top-0 h-dvh">{body}</div>
       </aside>
       {/* Mobile drawer */}
       {p.open && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Your conversations">
           <button className="absolute inset-0 bg-black/40" onClick={p.onClose} aria-label="Close panel" />
-          <aside className="absolute inset-y-0 left-0 w-[85%] max-w-80 bg-bg shadow-xl">{body}</aside>
+          <aside className="absolute inset-y-0 left-0 w-[85%] max-w-80 bg-bg/90 shadow-xl backdrop-blur-md">{body}</aside>
         </div>
       )}
     </>

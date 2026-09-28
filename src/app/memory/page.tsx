@@ -159,7 +159,7 @@ export default function MemoryPage() {
                 <div className="rounded-xl bg-danger-bg p-4 text-sm text-danger-ink">
                   Delete all {mems.length} notes? This can&apos;t be undone.
                   <div className="mt-2 flex gap-2">
-                    <button onClick={removeAll} className="rounded-lg bg-danger-ink px-3 py-1.5 font-medium text-white">Delete all</button>
+                    <button onClick={removeAll} className="rounded-lg bg-[#b91c1c] px-3 py-1.5 font-medium text-white">Delete all</button>
                     <button onClick={() => setConfirmAll(false)} className="rounded-lg border border-current px-3 py-1.5">Cancel</button>
                   </div>
                 </div>
@@ -173,7 +173,7 @@ export default function MemoryPage() {
                 <div className="rounded-xl bg-danger-bg p-4 text-sm text-danger-ink">
                   Delete your account, all conversations and all memory notes permanently?
                   <div className="mt-2 flex gap-2">
-                    <button onClick={deleteAccount} className="rounded-lg bg-danger-ink px-3 py-1.5 font-medium text-white">Delete my account</button>
+                    <button onClick={deleteAccount} className="rounded-lg bg-[#b91c1c] px-3 py-1.5 font-medium text-white">Delete my account</button>
                     <button onClick={() => setConfirmAccount(false)} className="rounded-lg border border-current px-3 py-1.5">Cancel</button>
                   </div>
                 </div>
