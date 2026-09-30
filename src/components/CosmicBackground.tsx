@@ -1,161 +1,119 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 /**
- * The app's backdrop, "Swarna Mandala": a deep peacock-teal sky with a vast golden lotus mandala that turns
- * very slowly, ringed with peacock-feather eyes, plus faint stars and rising gold dust.
- *
- * Everything is plain SVG + CSS animation (see the "Mandala backdrop" block in globals.css), so it costs
- * almost nothing to run. People who turn off motion on their device get a still picture.
- * The geometry is deterministic, so server and browser render the same markup.
+ * The app's backdrop: a deep night sky with a saffron-and-gold nebula (CSS, drifting over minutes)
+ * and a field of softly twinkling stars (one small canvas, ~20 frames a second).
+ * Motion is deliberately slow so it never competes with reading. People who turn off motion on
+ * their device get a still sky, and the animation pauses whenever the tab is hidden.
  */
-
-const CX = 400;
-const CY = 400;
-const GOLD = "#d9b45a";
-
-/** Seeded random numbers, so the stars and dust are identical on every render. */
-function seeded(seed: number) {
-  let s = seed;
-  return () => (s = (s * 16807) % 2147483647) / 2147483647;
-}
-
-function petalPath(r0: number, r1: number, w: number) {
-  const mid = (r0 + r1) / 2;
-  return `M${CX} ${CY - r0} C ${CX - w} ${CY - mid} ${CX - w * 0.4} ${CY - r1 + 6} ${CX} ${CY - r1} C ${CX + w * 0.4} ${CY - r1 + 6} ${CX + w} ${CY - mid} ${CX} ${CY - r0}Z`;
-}
-
-function Petals({ n, r0, r1, w, sw }: { n: number; r0: number; r1: number; w: number; sw: number }) {
-  const d = petalPath(r0, r1, w);
-  return (
-    <g fill="none" stroke={GOLD} strokeWidth={sw}>
-      {Array.from({ length: n }, (_, i) => (
-        <path key={i} d={d} transform={`rotate(${(i / n) * 360} ${CX} ${CY})`} />
-      ))}
-    </g>
-  );
-}
-
-function heart(cx: number, cy: number, r: number) {
-  return `M${cx} ${cy + r} C ${cx - r * 1.4} ${cy} ${cx - r * 1.1} ${cy - r * 1.3} ${cx} ${cy - r * 0.7} C ${cx + r * 1.1} ${cy - r * 1.3} ${cx + r * 1.4} ${cy} ${cx} ${cy + r} Z`;
-}
-
-/** One peacock-feather eye, centred on (0,0). */
-function PeacockEye({ s }: { s: number }) {
-  return (
-    <g>
-      <ellipse cx={0} cy={0} rx={17 * s} ry={22 * s} fill="url(#pk-e1)" />
-      <ellipse cx={0} cy={1 * s} rx={13 * s} ry={17.5 * s} fill="url(#pk-e2)" />
-      <ellipse cx={0} cy={2 * s} rx={10 * s} ry={13 * s} fill="url(#pk-e3)" />
-      <ellipse cx={0} cy={3 * s} rx={7 * s} ry={9.5 * s} fill="url(#pk-e4)" />
-      <path d={heart(0, 5 * s, 4.8 * s)} fill="url(#pk-e5)" />
-    </g>
-  );
-}
-
-const rnd = seeded(11);
-const STARS = Array.from({ length: 70 }, () => ({
-  x: rnd() * 1000,
-  y: rnd() * 1000,
-  r: rnd() < 0.08 ? 2.2 : 0.8 + rnd() * 1.1,
-  warm: rnd() < 0.3,
-  dur: 3 + rnd() * 6,
-  delay: -rnd() * 6,
-}));
-const DUST = Array.from({ length: 18 }, () => ({
-  x: rnd() * 1000,
-  y: 400 + rnd() * 600,
-  r: 1 + rnd() * 2.4,
-  dur: 16 + rnd() * 18,
-  delay: -rnd() * 34,
-}));
-
 export default function CosmicBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const COLORS = ["255,244,224", "255,244,224", "255,244,224", "255,216,155", "255,200,140", "207,224,255"];
+
+    type Star = { x: number; y: number; r: number; a: number; speed: number; phase: number; drift: number; color: string };
+    let stars: Star[] = [];
+    let w = 0;
+    let h = 0;
+    let raf = 0;
+    let last = 0;
+    let prev = 0;
+
+    function build() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas!.width = Math.round(w * dpr);
+      canvas!.height = Math.round(h * dpr);
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.max(120, Math.min(420, Math.round((w * h) / 4500)));
+      stars = Array.from({ length: count }, () => {
+        const bright = Math.random() < 0.06;
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: bright ? 1.3 + Math.random() * 0.9 : 0.3 + Math.random() * 0.9,
+          a: bright ? 0.75 + Math.random() * 0.25 : 0.25 + Math.random() * 0.6,
+          speed: 0.25 + Math.random() * 0.9, // twinkle, radians per second
+          phase: Math.random() * Math.PI * 2,
+          drift: 0.6 + Math.random() * 1.4, // depth: nearer stars drift a little faster
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        };
+      });
+    }
+
+    function draw(t: number) {
+      const dt = prev ? Math.min((t - prev) / 1000, 0.2) : 0;
+      prev = t;
+      ctx!.clearRect(0, 0, w, h);
+      for (const s of stars) {
+        if (!still.matches) {
+          s.x -= s.drift * 0.35 * dt; // the whole sky slides very slowly, about 20 px a minute
+          if (s.x < -4) s.x = w + 4;
+        }
+        const tw = still.matches ? 0.85 : 0.6 + 0.4 * Math.sin(s.phase + (t / 1000) * s.speed);
+        const alpha = s.a * tw;
+        if (s.r > 1.2) {
+          const g = ctx!.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 5);
+          g.addColorStop(0, `rgba(${s.color},${alpha * 0.45})`);
+          g.addColorStop(1, `rgba(${s.color},0)`);
+          ctx!.fillStyle = g;
+          ctx!.fillRect(s.x - s.r * 5, s.y - s.r * 5, s.r * 10, s.r * 10);
+        }
+        ctx!.fillStyle = `rgba(${s.color},${alpha})`;
+        ctx!.beginPath();
+        ctx!.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx!.fill();
+      }
+    }
+
+    function loop(t: number) {
+      raf = requestAnimationFrame(loop);
+      if (t - last < 50) return; // ~20 fps is plenty for a slow sky and easy on the battery
+      last = t;
+      draw(t);
+    }
+
+    function start() {
+      cancelAnimationFrame(raf);
+      prev = 0;
+      if (still.matches || document.hidden) draw(performance.now());
+      else raf = requestAnimationFrame(loop);
+    }
+
+    function onResize() {
+      build();
+      draw(performance.now());
+    }
+
+    build();
+    start();
+    window.addEventListener("resize", onResize);
+    document.addEventListener("visibilitychange", start);
+    still.addEventListener("change", start);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", start);
+      still.removeEventListener("change", start);
+    };
+  }, []);
+
   return (
     <div className="cosmos" aria-hidden="true">
-      {/* stars + rising gold dust, stretched over the whole screen */}
-      <svg className="cosmos-layer" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
-        {STARS.map((s, i) => (
-          <circle
-            key={i}
-            className="twinkle"
-            cx={s.x}
-            cy={s.y}
-            r={s.r}
-            fill={s.warm ? "#f3d995" : "#fff7e6"}
-            style={{ animationDuration: `${s.dur}s`, animationDelay: `${s.delay}s` }}
-          />
-        ))}
-        {DUST.map((d, i) => (
-          <circle
-            key={i}
-            className="dust"
-            cx={d.x}
-            cy={d.y}
-            r={d.r}
-            fill="#f0d58a"
-            style={{ animationDuration: `${d.dur}s`, animationDelay: `${d.delay}s` }}
-          />
-        ))}
-      </svg>
-
-      {/* the mandala: a square drawing centred a little above the middle of the screen */}
-      <svg className="mandala" viewBox="0 0 800 800">
-        <defs>
-          <radialGradient id="pk-e1" cx="50%" cy="55%" r="50%">
-            <stop offset="0" stopColor="#d8b457" stopOpacity="0.95" />
-            <stop offset="0.75" stopColor="#9c7a2a" stopOpacity="0.85" />
-            <stop offset="1" stopColor="#6e5a1c" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="pk-e2" cx="50%" cy="58%" r="50%">
-            <stop offset="0" stopColor="#3fd0a0" />
-            <stop offset="1" stopColor="#12704c" />
-          </radialGradient>
-          <radialGradient id="pk-e3" cx="50%" cy="60%" r="50%">
-            <stop offset="0" stopColor="#43e6e0" />
-            <stop offset="1" stopColor="#0c8f9c" />
-          </radialGradient>
-          <radialGradient id="pk-e4" cx="50%" cy="62%" r="50%">
-            <stop offset="0" stopColor="#3d7bff" />
-            <stop offset="1" stopColor="#1a3aa0" />
-          </radialGradient>
-          <radialGradient id="pk-e5" cx="50%" cy="65%" r="55%">
-            <stop offset="0" stopColor="#1a2a7a" />
-            <stop offset="1" stopColor="#060c33" />
-          </radialGradient>
-          <radialGradient id="mandala-glow">
-            <stop offset="0" stopColor="#f1d58a" stopOpacity="0.28" />
-            <stop offset="1" stopColor="#f1d58a" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        <circle cx={CX} cy={CY} r={200} fill="url(#mandala-glow)" />
-
-        <g className="spin spin-slow mandala-outer">
-          {[380, 332, 288, 190, 122, 76].map((r, i) => (
-            <circle key={r} cx={CX} cy={CY} r={r} fill="none" stroke={GOLD} strokeWidth={i % 2 ? 0.8 : 1.3} />
-          ))}
-          <Petals n={32} r0={288} r1={376} w={28} sw={0.9} />
-          <Petals n={24} r0={190} r1={286} w={33} sw={1.1} />
-          {Array.from({ length: 64 }, (_, i) => {
-            const a = (i / 64) * Math.PI * 2;
-            return <circle key={i} cx={CX + Math.cos(a) * 310} cy={CY + Math.sin(a) * 310} r={1.8} fill={GOLD} />;
-          })}
-        </g>
-
-        <g className="spin spin-rev mandala-inner">
-          <Petals n={16} r0={122} r1={190} w={28} sw={1.3} />
-          <Petals n={12} r0={76} r1={122} w={20} sw={1.3} />
-          <circle cx={CX} cy={CY} r={40} fill="none" stroke={GOLD} strokeWidth={1.2} />
-          <Petals n={8} r0={0} r1={40} w={12} sw={1.1} />
-        </g>
-
-        <g className="spin spin-slow mandala-eyes">
-          {Array.from({ length: 8 }, (_, i) => (
-            <g key={i} transform={`rotate(${i * 45 + 22.5} ${CX} ${CY}) translate(${CX} ${CY - 240})`}>
-              <PeacockEye s={1.15} />
-            </g>
-          ))}
-        </g>
-      </svg>
-
+      <div className="nebula nebula-a" />
+      <div className="nebula nebula-b" />
+      <div className="nebula nebula-c" />
+      <div className="galaxy-band" />
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       <div className="cosmos-vignette" />
     </div>
   );

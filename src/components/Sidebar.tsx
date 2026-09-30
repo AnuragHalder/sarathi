@@ -147,7 +147,7 @@ export default function Sidebar(p: Props) {
   return (
     <>
       {/* Desktop column */}
-      <aside className="hidden w-72 shrink-0 border-r border-line bg-bg/70 backdrop-blur-md lg:block">
+      <aside className="hidden w-72 shrink-0 border-r border-line bg-bg/45 backdrop-blur-md lg:block">
         <div className="sticky top-0 h-dvh">{body}</div>
       </aside>
       {/* Mobile drawer */}

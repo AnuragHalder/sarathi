@@ -62,14 +62,13 @@ The report shows distinct verses cited, % of replies citing chapter 1, banned-ph
 - Without the two `NEXT_PUBLIC_SUPABASE_*` variables the app still works, guest-only.
 - **Usage limits** (server-side): 15 messages/day per guest IP, 60/day per signed-in user (`RATE_LIMIT_GUEST`, `RATE_LIMIT_USER`). Needs `supabase/002_rate_limit.sql` run once.
 
-## Background: "Swarna Mandala"
+## Cosmic background
 
-The whole app sits on a deep peacock-teal backdrop with a vast golden lotus mandala that turns very slowly
-(one turn every 4–5 minutes), ringed with peacock-feather eyes, plus faint twinkling stars and rising gold dust
-(`src/components/CosmicBackground.tsx` + the "Mandala backdrop" block in `src/app/globals.css`). It is plain SVG
-and CSS animation, so it is cheap to run; people who turn off motion on their device get a still picture.
-Readability: text on the page gets a soft dark halo, and cards and panels are nearly opaque. Colours live in the
-`:root` variables at the top of `globals.css`.
+The whole app sits on a night sky (`src/components/CosmicBackground.tsx` + the "Cosmic backdrop" block in
+`src/app/globals.css`): a saffron, gold and violet nebula that drifts over a few minutes, a faint Milky Way band,
+and ~120–420 softly twinkling stars on one small canvas (about 20 frames a second, paused when the tab is hidden).
+People who turn off motion on their device get a still sky. Colours live in the `:root` variables at the top of
+`globals.css`; surfaces are slightly see-through so the sky shows behind cards and panels.
 
 ## Background music
 

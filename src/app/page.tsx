@@ -285,7 +285,7 @@ export default function Home() {
       />
 
       <div className="mx-auto flex min-h-dvh w-full min-w-0 max-w-2xl flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-line bg-bg/70 px-4 py-3 backdrop-blur-md">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-line bg-bg/55 px-4 py-3 backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -452,7 +452,7 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.3</span>
+            <span className="opacity-60">· v3.2</span>
           </p>
         </footer>
       </div>
