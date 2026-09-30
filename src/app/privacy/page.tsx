@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Privacy policy · Sarathi" };
 
 // Have this reviewed (ideally by a lawyer familiar with India's DPDP Act) as the app grows.
 const CONTACT_EMAIL = "anurag.economics@gmail.com";
-const UPDATED = "25 September 2026";
+const UPDATED = "1 October 2026";
 
 export default function Privacy() {
   return (
@@ -27,7 +27,8 @@ export default function Privacy() {
           <li><strong>Google account basics</strong> when you sign in: name, email address and profile photo.</li>
           <li><strong>Your conversations</strong>: the messages you send and Sarathi&apos;s replies.</li>
           <li><strong>Memory notes</strong> (only if memory is on): short notes drawn from your conversations, such as an ongoing situation or what has helped you.</li>
-          <li><strong>Settings</strong>: your preferred guidance style, memory on/off, and your consent record.</li>
+          <li><strong>Settings</strong>: your preferred guidance style, memory on/off, check-in emails on/off, and your consent record.</li>
+          <li><strong>Check-ins</strong> (only if you turn them on): the practice Sarathi suggested, when the follow-up email was sent, and the answer you tapped (for example &ldquo;It helped&rdquo;).</li>
           <li>If you use Sarathi without signing in, your conversations stay in your browser and are not stored on our servers.</li>
         </ul>
 
@@ -35,6 +36,7 @@ export default function Privacy() {
         <ul>
           <li>To sign you in and let you return to past conversations.</li>
           <li>To make guidance more relevant to you over time (memory).</li>
+          <li>If you ask for them, to email you a short check-in the morning after a conversation. The subject line never mentions what you talked about.</li>
           <li>To keep the service safe and working, for example preventing abuse.</li>
         </ul>
         <p>We do not sell your data, and we do not use it for advertising.</p>
@@ -44,12 +46,14 @@ export default function Privacy() {
           <li><strong>Supabase</strong> stores accounts, conversations and memory notes.</li>
           <li><strong>OpenAI</strong> processes messages to write replies and memory notes. Data sent through OpenAI&apos;s API is not used to train their models by default.</li>
           <li><strong>Vercel</strong> hosts the app.</li>
+          <li><strong>Resend</strong> delivers check-in emails, if you turn them on.</li>
         </ul>
 
         <h2>Your choices and rights</h2>
         <ul>
           <li>View, edit or delete any memory note, or switch memory off, on the <Link href="/memory" className="text-accent underline">What Sarathi knows</Link> page.</li>
           <li>Delete any conversation from the side panel.</li>
+          <li>Stop check-in emails with the link in any email, or switch them off on the same page.</li>
           <li>Delete your account and all your data at any time from the same page. This is permanent.</li>
           <li>Withdraw consent at any time by switching memory off or deleting your account.</li>
           <li>Contact us about your data at <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent underline">{CONTACT_EMAIL}</a>.</li>

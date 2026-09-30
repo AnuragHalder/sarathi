@@ -83,6 +83,23 @@ no image download. Its stars bloom out from a bright core over ~3 seconds ("crea
 slowly, inner stars faster than outer ones. About 7,000 stars on phones and 11,000 on larger screens, ~30 frames
 a second, paused when the tab is hidden. With "reduced motion" on, the bloom is skipped but the slow turning stays.
 
+## Morning check-in emails (v3.7)
+
+When Sarathi gives a practice, it writes it as `[[practice]]…[[/practice]]` (shown as a "Today's practice" card). Signed-in
+people are then offered: *"Would you like me to check in with you tomorrow morning?"* After a yes, every conversation with
+a practice is scheduled automatically (with a "Not this time" link).
+
+- `supabase/003_checkins.sql` (run once): `profiles.checkins_enabled`, the `checkins` table, and two functions only the
+  server's secret key may call.
+- Every morning Vercel calls `/api/cron/checkins` (`vercel.json`: 02:30 UTC = 8–9 am India). For each check-in due today it
+  reads the conversation, has the AI write the "I remember…" lines in the person's language (`src/lib/checkinWriter.ts`),
+  fills the email (`src/lib/email.ts`) and sends it with Resend. Up to 100 a day (Resend's free limit).
+- Never sent for guests, crisis conversations, or people who haven't said yes. One email per conversation at most.
+- The email's "It helped / Still hard / Not yet" buttons open that conversation and send the answer; the answer is saved.
+- "Stop check-in emails" (and Gmail's own Unsubscribe button) turn them off; so does the switch on `/memory`.
+- The owner (`ADMIN_EMAIL`) sees "Send me a test check-in now" on `/memory`.
+- Needs `RESEND_API_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET` and `ADMIN_EMAIL` in Vercel (all Secrets).
+
 ## Background music
 
 Put an MP3 at `public/audio/calm.mp3`. It loops quietly (30% volume, 2.5 s fade-in). Browsers only allow sound

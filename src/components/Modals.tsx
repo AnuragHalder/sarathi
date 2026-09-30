@@ -13,14 +13,29 @@ function Shell({ children, label }: { children: React.ReactNode; label: string }
 }
 
 /** Shown when a guest has used their free chats. */
-export function SignInPrompt({ onSignIn, onClose }: { onSignIn: () => void; onClose: () => void }) {
+export function SignInPrompt({
+  onSignIn,
+  onClose,
+  reason = "limit",
+}: {
+  onSignIn: () => void;
+  onClose: () => void;
+  reason?: "limit" | "checkin";
+}) {
   return (
     <Shell label="Sign in to continue">
-      <h2 className="font-serif text-2xl font-semibold">Keep talking with Sarathi</h2>
-      <p className="mt-2 text-muted">
-        You&apos;ve used your free guest conversations. Sign in with Google (it&apos;s free) to keep going. Your
-        conversations so far will be saved to your account, and Sarathi will start to remember what matters to you.
-      </p>
+      <h2 className="font-serif text-2xl font-semibold">{reason === "checkin" ? "Continue your conversation" : "Keep talking with Sarathi"}</h2>
+      {reason === "checkin" ? (
+        <p className="mt-2 text-muted">
+          Sign in with the same Google account you use for Sarathi, and your answer will be shared with Sarathi in that
+          conversation.
+        </p>
+      ) : (
+        <p className="mt-2 text-muted">
+          You&apos;ve used your free guest conversations. Sign in with Google (it&apos;s free) to keep going. Your
+          conversations so far will be saved to your account, and Sarathi will start to remember what matters to you.
+        </p>
+      )}
       <GoogleButton onClick={onSignIn} className="mt-5 w-full" />
       <button onClick={onClose} className="mt-3 w-full text-sm text-muted hover:text-ink">
         Not now

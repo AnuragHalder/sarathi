@@ -1,7 +1,7 @@
 // Guest chats live only in this browser (localStorage) until the visitor signs in.
 import type { Style } from "./styles";
 
-export type ChatMsg = { role: "user" | "assistant"; content: string; style?: Style; crisis?: boolean };
+export type ChatMsg = { role: "user" | "assistant"; content: string; style?: Style; crisis?: boolean; fresh?: boolean };
 export type GuestChat = { id: string; title: string; style: Style; updatedAt: string; messages: ChatMsg[] };
 
 const KEY = "sarathi-guest-chats";
