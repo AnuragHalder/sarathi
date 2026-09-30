@@ -452,7 +452,7 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.4</span>
+            <span className="opacity-60">· v3.5</span>
           </p>
         </footer>
       </div>

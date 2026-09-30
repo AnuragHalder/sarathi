@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
  * The app's backdrop: a deep night sky with a saffron-and-gold nebula (CSS, drifting over minutes)
  * and a field of softly twinkling stars (one small canvas, ~20 frames a second).
  * Motion is deliberately slow so it never competes with reading. People who turn off motion on
- * their device get a still sky, and the animation pauses whenever the tab is hidden.
+ * their device still get the gentle twinkle, with the drift slowed to half; it pauses whenever the tab is hidden.
  */
 export default function CosmicBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,11 +55,11 @@ export default function CosmicBackground() {
       prev = t;
       ctx!.clearRect(0, 0, w, h);
       for (const s of stars) {
-        if (!still.matches) {
-          s.x -= s.drift * 0.35 * dt; // the whole sky slides very slowly, about 20 px a minute
+        {
+          s.x -= s.drift * (still.matches ? 0.18 : 0.35) * dt; // the whole sky slides very slowly, about 20 px a minute
           if (s.x < -4) s.x = w + 4;
         }
-        const tw = still.matches ? 0.85 : 0.6 + 0.4 * Math.sin(s.phase + (t / 1000) * s.speed);
+        const tw = 0.6 + 0.4 * Math.sin(s.phase + (t / 1000) * s.speed);
         const alpha = s.a * tw;
         if (s.r > 1.2) {
           const g = ctx!.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 5);
@@ -85,7 +85,7 @@ export default function CosmicBackground() {
     function start() {
       cancelAnimationFrame(raf);
       prev = 0;
-      if (still.matches || document.hidden) draw(performance.now());
+      if (document.hidden) draw(performance.now());
       else raf = requestAnimationFrame(loop);
     }
 

@@ -75,7 +75,7 @@ People who turn off motion on their device get a still sky. Colours live in the 
 The first-visit welcome screen shows a spiral galaxy drawn live on a canvas (`src/components/GalaxyIntro.tsx`),
 no image download. Its stars bloom out from a bright core over ~3 seconds ("creation"), then it keeps turning
 slowly, inner stars faster than outer ones. About 7,000 stars on phones and 11,000 on larger screens, ~30 frames
-a second, paused when the tab is hidden, and still for people who turn off motion.
+a second, paused when the tab is hidden. With "reduced motion" on, the bloom is skipped but the slow turning stays.
 
 ## Background music
 

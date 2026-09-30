@@ -6,7 +6,8 @@ import { useEffect, useRef } from "react";
  * A spiral galaxy for the welcome screen, drawn live on a canvas (no image or GIF to download).
  * It is "born" first: the stars bloom out from a bright core over about 3 seconds, then the galaxy
  * keeps turning slowly, with the inner stars moving faster than the outer ones, as in a real galaxy.
- * People who turn off motion on their device see it still, already fully formed.
+ * People who ask their device for reduced motion skip the bloom (it appears fully formed) but still see
+ * the slow, gentle turning, which is calm enough not to be a motion trigger.
  */
 export default function GalaxyIntro() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -15,7 +16,7 @@ export default function GalaxyIntro() {
     const canvas = ref.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // Colour groups, drawn one group at a time (cheap: one fillStyle per group per frame).
     const GROUPS = [
@@ -72,7 +73,7 @@ export default function GalaxyIntro() {
 
     function draw(now: number) {
       const t = (now - start) / 1000;
-      const bloom = still ? 1 : 1 - Math.pow(1 - Math.min(t / 3.2, 1), 3); // ease-out birth
+      const bloom = calm ? 1 : 1 - Math.pow(1 - Math.min(t / 3.2, 1), 3); // ease-out birth
       ctx!.clearRect(0, 0, w, h);
 
       // soft haze of unresolved starlight across the whole disc (what makes it look like a photo)
@@ -112,7 +113,7 @@ export default function GalaxyIntro() {
         for (const p of pts) {
           if (p.g !== gi) continue;
           // inner stars orbit faster: one outer turn takes about 4 minutes
-          const ang = p.a + (still ? 0 : t * (0.026 / (p.r + 0.12)));
+          const ang = p.a + t * (0.026 / (p.r + 0.12));
           const rr = p.r * R * bloom;
           const x = Math.cos(ang) * rr;
           const y = Math.sin(ang) * rr * SQUASH;
@@ -133,12 +134,12 @@ export default function GalaxyIntro() {
 
     function onVisibility() {
       cancelAnimationFrame(raf);
-      if (!document.hidden && !still) raf = requestAnimationFrame(loop);
+      if (!document.hidden) raf = requestAnimationFrame(loop);
     }
 
     size();
     draw(performance.now());
-    if (!still) raf = requestAnimationFrame(loop);
+    raf = requestAnimationFrame(loop);
     const onResize = () => { size(); draw(performance.now()); };
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibility);
