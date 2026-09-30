@@ -109,6 +109,10 @@ export function buildContext(style: Style, sit: Situation, history: Msg[], crisi
       );
     }
   }
+  // The first advising replies decide whether the person feels understood (see OPENING in the prompt).
+  // A clarifying question may come first, so "opening" covers up to one earlier Sarathi reply.
+  const earlier = history.filter((m) => m.role === "assistant").length;
+  lines.push(`OPENING: ${earlier <= 1 ? "yes" : "no"}`);
   lines.push(`ALREADY_CITED: ${[...cited].join(", ") || "none"}`);
   if (shortlist.length) {
     lines.push("SHORTLIST (verse | speaker | translation; COMMENTARY EXCERPTS for the first eight):");

@@ -19,12 +19,15 @@ import {
   type ChatMsg,
 } from "@/lib/guest";
 
-const SUGGESTIONS = [
-  "I'm anxious about my career and can't stop overthinking results.",
-  "I lost someone close to me and I can't move on.",
-  "I get angry quickly and later regret it.",
-  "I don't know what my purpose in life is.",
-  "Mujhe exam ka bahut darr lag raha hai.",
+/** Gentle starts: tapping one begins the message in the person's own words; they carry on typing. */
+const TOPICS: { label: string; starter: string }[] = [
+  { label: "Work", starter: "It's about my work: " },
+  { label: "Family", starter: "It's about my family: " },
+  { label: "A relationship", starter: "It's about a relationship: " },
+  { label: "Loss", starter: "I've lost someone or something: " },
+  { label: "Self-doubt", starter: "I've been doubting myself: " },
+  { label: "A decision", starter: "I have to make a decision: " },
+  { label: "Something else", starter: "" },
 ];
 
 function setUrlChat(id: string | null) {
@@ -54,6 +57,17 @@ export default function Home() {
   const currentIdRef = useRef<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
+
+  /** Put a topic's opening words in the box and place the cursor after them, ready to keep typing. */
+  function startWith(starter: string) {
+    setInput(starter);
+    requestAnimationFrame(() => {
+      const ta = taRef.current;
+      if (!ta) return;
+      ta.focus();
+      ta.setSelectionRange(starter.length, starter.length);
+    });
+  }
   const openedFromUrl = useRef(false);
 
   const selectConv = (id: string | null) => {
@@ -341,6 +355,18 @@ export default function Home() {
                 Share what you&apos;re facing. Sarathi responds with the wisdom of the Gita.
               </p>
 
+              <h2 className="mt-8 mb-2 text-sm font-medium text-muted">What is it about?</h2>
+              <div className="flex flex-wrap gap-2">
+                {TOPICS.map((t) => (
+                  <button
+                    key={t.label}
+                    onClick={() => startWith(t.starter)}
+                    className="rounded-full border border-line bg-surface px-4 py-2 text-sm hover:border-gold"
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
               <h2 className="mt-8 mb-2 text-sm font-medium text-muted">Choose how you&apos;d like guidance</h2>
               <div className="grid gap-2 sm:grid-cols-3">
                 {(Object.keys(STYLES) as Style[]).map((k) => (
@@ -358,18 +384,6 @@ export default function Home() {
                 ))}
               </div>
 
-              <h2 className="mt-8 mb-2 text-sm font-medium text-muted">Or start with</h2>
-              <div className="flex flex-wrap gap-2">
-                {SUGGESTIONS.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => send(s)}
-                    className="rounded-full border border-line bg-surface px-3 py-1.5 text-left text-sm hover:border-gold"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
             </section>
           ) : (
             <section className="space-y-5 pt-5" aria-live="polite">
@@ -452,7 +466,7 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.5</span>
+            <span className="opacity-60">· v3.6</span>
           </p>
         </footer>
       </div>
