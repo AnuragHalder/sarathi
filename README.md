@@ -18,6 +18,12 @@ Each message goes through two steps:
 
 `src/lib/themes.ts` holds the 40 themes and 17 Arjuna moments; `src/lib/prompts.ts` holds both prompts.
 
+**Opening replies (v3.6):** for the first advising reply of a conversation the context says `OPENING: yes`. Sarathi then
+opens by naming the feeling underneath the message, keeps to 150–250 words, ends with one practice and a warm
+invitation to come back ("Tell me tonight how it went"), and asks at most one question per reply. It mirrors the
+person's language and script (Hinglish stays in Roman letters). The home screen offers topic buttons (Work, Family,
+A relationship, Loss, Self-doubt, A decision, Something else) that start the message for the person.
+
 ### Measuring quality
 
 ```bash
