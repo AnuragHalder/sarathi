@@ -11,6 +11,8 @@ export type Profile = {
   avatar_url: string | null;
   memory_enabled: boolean;
   consented_at: string | null;
+  checkins_enabled: boolean;
+  checkins_declined_at: string | null;
 };
 
 /** Signed-in user + profile row, kept in sync with Supabase auth state. */
@@ -28,7 +30,7 @@ export function useAuth() {
       setReady(true);
       return;
     }
-    const { data: p } = await sb.from("profiles").select("id, name, avatar_url, memory_enabled, consented_at").eq("id", u.id).maybeSingle();
+    const { data: p } = await sb.from("profiles").select("id, name, avatar_url, memory_enabled, consented_at, checkins_enabled, checkins_declined_at").eq("id", u.id).maybeSingle();
     setProfile({
       id: u.id,
       email: u.email ?? null,
@@ -36,6 +38,8 @@ export function useAuth() {
       avatar_url: p?.avatar_url ?? (u.user_metadata?.avatar_url as string | undefined) ?? null,
       memory_enabled: p?.memory_enabled ?? true,
       consented_at: p?.consented_at ?? null,
+      checkins_enabled: p?.checkins_enabled ?? false,
+      checkins_declined_at: p?.checkins_declined_at ?? null,
     });
     setReady(true);
   }, []);
@@ -68,7 +72,7 @@ export function useAuth() {
   }, []);
 
   const updateProfile = useCallback(
-    async (patch: Partial<Pick<Profile, "memory_enabled" | "consented_at">>) => {
+    async (patch: Partial<Pick<Profile, "memory_enabled" | "consented_at" | "checkins_enabled" | "checkins_declined_at">>) => {
       const sb = getBrowserSupabase();
       if (!sb || !profile) return;
       const { error } = await sb.from("profiles").upsert({ id: profile.id, ...patch });

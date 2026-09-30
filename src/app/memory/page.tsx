@@ -42,6 +42,25 @@ export default function MemoryPage() {
     load();
   }, [load]);
 
+  // "Send me a test check-in now" is only shown to the app owner (ADMIN_EMAIL on the server).
+  const [canTest, setCanTest] = useState(false);
+  const [testing, setTesting] = useState(false);
+  useEffect(() => {
+    if (!profile) return;
+    fetch("/api/checkins/test")
+      .then((r) => (r.ok ? r.json() : { allowed: false }))
+      .then((j) => setCanTest(Boolean(j.allowed)))
+      .catch(() => {});
+  }, [profile]);
+
+  async function sendTest() {
+    setTesting(true);
+    const res = await fetch("/api/checkins/test", { method: "POST" });
+    const j = await res.json().catch(() => ({}));
+    setMsg(res.ok ? `Test check-in sent to ${j.to}. It can take a minute to arrive.` : j.error || "Couldn't send the test.");
+    setTesting(false);
+  }
+
   async function remove(id: string) {
     const sb = getBrowserSupabase();
     if (!sb) return;
@@ -113,6 +132,37 @@ export default function MemoryPage() {
               <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${profile.memory_enabled ? "left-6" : "left-1"}`} />
               <span className="sr-only">Memory</span>
             </button>
+          </section>
+
+          <section className="mt-3 rounded-2xl border border-line bg-surface p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <div className="font-medium">Morning check-in emails are {profile.checkins_enabled ? "on" : "off"}</div>
+                <div className="text-sm text-muted">
+                  {profile.checkins_enabled
+                    ? `The morning after a conversation where Sarathi gives you a practice, it emails you (${profile.email ?? "your Google address"}) to ask how it went.`
+                    : "When on, Sarathi emails you the morning after a conversation to ask how your practice went."}
+                </div>
+              </div>
+              <button
+                role="switch"
+                aria-checked={profile.checkins_enabled}
+                onClick={() => auth.updateProfile({ checkins_enabled: !profile.checkins_enabled })}
+                className={`relative h-7 w-12 shrink-0 rounded-full transition ${profile.checkins_enabled ? "bg-accent" : "bg-line"}`}
+              >
+                <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${profile.checkins_enabled ? "left-6" : "left-1"}`} />
+                <span className="sr-only">Morning check-in emails</span>
+              </button>
+            </div>
+            {canTest && (
+              <button
+                disabled={testing}
+                onClick={sendTest}
+                className="mt-3 rounded-xl border border-line px-3 py-1.5 text-sm text-muted hover:text-ink disabled:opacity-50"
+              >
+                {testing ? "Sending…" : "Send me a test check-in now"}
+              </button>
+            )}
           </section>
 
           {msg && <p className="mt-4 text-sm text-accent">{msg}</p>}

@@ -6,6 +6,7 @@ import AmbientAudio from "@/components/AmbientAudio";
 import Welcome from "@/components/Welcome";
 import Sidebar, { type ConvItem } from "@/components/Sidebar";
 import { ConsentDialog, SignInPrompt } from "@/components/Modals";
+import CheckinOffer from "@/components/CheckinOffer";
 import { STYLES, type Style } from "@/lib/styles";
 import { useAuth } from "@/lib/useAuth";
 import { getBrowserSupabase } from "@/lib/supabase/client";
@@ -69,6 +70,9 @@ export default function Home() {
     });
   }
   const openedFromUrl = useRef(false);
+  /** A one-tap answer from a check-in email ("It helped"…), sent once that conversation is open. */
+  const pendingAnswer = useRef<{ conv: string; checkin: string; answer: string; text: string } | null>(null);
+  const [signInReason, setSignInReason] = useState<"limit" | "checkin">("limit");
 
   const selectConv = (id: string | null) => {
     currentIdRef.current = id;
@@ -90,9 +94,32 @@ export default function Home() {
       localStorage.setItem("sarathi-style", style);
     } catch {}
   }, [style]);
+  // Keep the newest reply in view, including when verse cards finish loading and grow, but not if the
+  // person has scrolled up to read something earlier.
+  const stickToBottom = useRef(true);
+  const autoScrollAt = useRef(0);
   useEffect(() => {
+    const onScroll = () => {
+      if (Date.now() - autoScrollAt.current < 800) return; // our own smooth scroll, not the reader
+      stickToBottom.current = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 160;
+    };
+    const ro = new ResizeObserver(() => {
+      if (!stickToBottom.current) return;
+      autoScrollAt.current = Date.now();
+      window.scrollTo({ top: document.documentElement.scrollHeight });
+    });
+    ro.observe(document.body);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+  useEffect(() => {
+    if (!stickToBottom.current) return;
+    autoScrollAt.current = Date.now();
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages]);
+  }, [messages, busy]); // busy: also after the reply finishes, so the check-in offer below it comes into view
 
   // ---- conversation list
   const refreshList = useCallback(async () => {
@@ -162,11 +189,41 @@ export default function Home() {
       await refreshList();
       if (!openedFromUrl.current) {
         openedFromUrl.current = true;
-        const id = new URL(window.location.href).searchParams.get("c");
+        const params = new URL(window.location.href).searchParams;
+        const id = params.get("c");
+        const checkin = params.get("checkin");
+        const answer = params.get("a");
+        if (id && checkin && answer && ["helped", "hard", "not_yet"].includes(answer)) {
+          if (!profile) {
+            // Opened from the email on a device where they aren't signed in yet.
+            setSignInReason("checkin");
+            setAskSignIn(true);
+            return;
+          }
+          const fallback = { helped: "It helped.", hard: "It's still hard.", not_yet: "I haven't tried it yet." }[answer as "helped"];
+          const text = (params.get("t") || "").slice(0, 60).trim() || fallback;
+          pendingAnswer.current = { conv: id, checkin, answer, text };
+        }
         if (id) openConversation(id);
       }
     })();
   }, [auth.ready, profile?.id, profile?.consented_at]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Send the email's one-tap answer as soon as its conversation is showing.
+  useEffect(() => {
+    const p = pendingAnswer.current;
+    if (!p || busy || currentId !== p.conv || !messages.length || !profile?.consented_at) return;
+    pendingAnswer.current = null;
+    const url = new URL(window.location.href);
+    ["checkin", "a", "t"].forEach((k) => url.searchParams.delete(k));
+    window.history.replaceState(null, "", url);
+    getBrowserSupabase()
+      ?.from("checkins")
+      .update({ answer: p.answer, answered_at: new Date().toISOString() })
+      .eq("id", p.checkin)
+      .then(() => {});
+    send(p.text);
+  }, [currentId, messages.length, busy, profile?.consented_at]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function newChat() {
     if (busy) return;
@@ -189,6 +246,17 @@ export default function Home() {
     refreshList();
   }
 
+  /** The check-in offer goes under the newest reply, only when it has a practice and wasn't a crisis. */
+  function showCheckinOffer(m: ChatMsg, i: number) {
+    if (!signedIn || !profile?.consented_at || busy || i !== messages.length - 1) return false;
+    if (!m.fresh || m.crisis || !/\[\[\s*practice\s*\]\]/i.test(m.content)) return false;
+    if (messages.some((x) => x.crisis)) return false;
+    if (profile.checkins_enabled) return true;
+    // After "No thanks", don't offer again for two weeks.
+    const declined = profile.checkins_declined_at ? Date.parse(profile.checkins_declined_at) : 0;
+    return Date.now() - declined > 14 * 24 * 3600_000;
+  }
+
   // ---- sending
   async function send(text: string) {
     const content = text.trim();
@@ -199,6 +267,7 @@ export default function Home() {
       setAskSignIn(true);
       return;
     }
+    stickToBottom.current = true;
     const history: ChatMsg[] = [...messages, { role: "user", content }];
     setMessages([...history, { role: "assistant", content: "", style }]);
     setInput("");
@@ -243,7 +312,7 @@ export default function Home() {
         finalText = snapshot;
         setMessages((m) => {
           const copy = [...m];
-          copy[copy.length - 1] = { role: "assistant", content: snapshot, style, crisis };
+          copy[copy.length - 1] = { role: "assistant", content: snapshot, style, crisis, fresh: true };
           return copy;
         });
       }
@@ -269,7 +338,7 @@ export default function Home() {
     } finally {
       setBusy(false);
       refreshList();
-      taRef.current?.focus();
+      taRef.current?.focus({ preventScroll: true }); // keep the smooth scroll to the new reply going
     }
   }
 
@@ -291,7 +360,7 @@ export default function Home() {
         profile={profile}
         authEnabled={auth.enabled}
         guestLeft={guestLeft}
-        onSignIn={() => auth.signIn()}
+        onSignIn={() => auth.signIn(window.location.pathname + window.location.search)}
         onSignOut={async () => {
           await auth.signOut();
           newChat();
@@ -403,6 +472,9 @@ export default function Home() {
                     ) : (
                       <p className="animate-pulse text-muted">Reflecting…</p>
                     )}
+                    {showCheckinOffer(m, i) && currentId && (
+                      <CheckinOffer conversationId={currentId} enabled={Boolean(profile?.checkins_enabled)} onEnabled={auth.reload} />
+                    )}
                   </div>
                 ),
               )}
@@ -466,14 +538,15 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.6</span>
+            <span className="opacity-60">· v3.7</span>
           </p>
         </footer>
       </div>
 
       {askSignIn && (
         <SignInPrompt
-          onSignIn={() => auth.signIn()}
+          reason={signInReason}
+          onSignIn={() => auth.signIn(window.location.pathname + window.location.search)}
           onClose={() => setAskSignIn(false)}
         />
       )}

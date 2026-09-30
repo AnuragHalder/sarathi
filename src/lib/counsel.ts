@@ -21,6 +21,12 @@ export const READER_MODEL = process.env.OPENAI_READER_MODEL || "gpt-6-luna";
 const EFFORT = process.env.OPENAI_REASONING_EFFORT ?? "low";
 
 const VERSE = new Map(verses.map((v) => [v.id, v]));
+
+/** Sanskrit + translation for one verse id like "2.47" (used by the check-in email). */
+export function getVerse(id: string) {
+  const v = VERSE.get(id);
+  return v ? { id: v.id, sanskrit: v.sanskrit, translation: v.translation } : null;
+}
 const EXCERPTS = excerpts as Record<string, { by: string; text: string }[]>;
 const SPEAKER: Record<string, string> = { "श्रीभगवान्": "Krishna", "अर्जुन": "Arjuna", "सञ्जय": "Sanjaya", "धृतराष्ट्र": "Dhritarashtra" };
 

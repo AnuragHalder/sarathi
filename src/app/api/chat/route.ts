@@ -6,6 +6,7 @@ import { getServerSupabase, getUserId } from "@/lib/supabase/server";
 import { isCheckpointTurn, loadMemoryContext, runCheckpoint } from "@/lib/memory";
 import { titleFrom } from "@/lib/guest";
 import { allowRequest, GUEST_DAILY, USER_DAILY } from "@/lib/rateLimit";
+import { scheduleCheckin } from "@/lib/checkins";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -59,9 +60,11 @@ export async function POST(req: Request) {
   let userTurns = 0;
   let lastCheckpoint = 0;
   let memoryOn = false;
+  let checkinsOn = false;
   if (supabase && userId) {
-    const { data: profile } = await supabase.from("profiles").select("memory_enabled, consented_at").eq("id", userId).maybeSingle();
+    const { data: profile } = await supabase.from("profiles").select("memory_enabled, consented_at, checkins_enabled").eq("id", userId).maybeSingle();
     memoryOn = profile?.memory_enabled !== false && Boolean(profile?.consented_at);
+    checkinsOn = Boolean(profile?.checkins_enabled);
     if (body.conversationId) {
       const { data: conv } = await supabase
         .from("conversations")
@@ -143,6 +146,8 @@ export async function POST(req: Request) {
         if (supabase && userId && conversationId && reply.trim()) {
           await supabase.from("messages").insert({ conversation_id: conversationId, user_id: userId, role: "assistant", content: reply, style });
           await supabase.from("conversations").update({ user_turns: userTurns, style, updated_at: new Date().toISOString() }).eq("id", conversationId);
+          // Morning check-in: people who said yes get one for the latest practice in this conversation.
+          if (checkinsOn && !crisis) await scheduleCheckin(supabase, userId, conversationId, reply);
         }
         controller.close();
       }

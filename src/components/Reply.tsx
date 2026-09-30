@@ -4,11 +4,32 @@ import ReactMarkdown from "react-markdown";
 import VerseCard from "./VerseCard";
 
 const TAG = /\[\[\s*(?:BG\s*)?(\d{1,2})\.(\d{1,2})\s*\]\]/gi;
+// The one practice, written by Sarathi as [[practice]] … [[/practice]]. While streaming it may still be open.
+const PRACTICE = /\[\[\s*practice\s*\]\]([\s\S]*?)(?:\[\[\s*\/\s*practice\s*\]\]|$)/i;
+
+/** A highlighted card for today's practice. */
+function PracticeCard({ text }: { text: string }) {
+  return (
+    <aside className="my-3 rounded-2xl border border-gold/40 bg-accent-soft px-4 py-3">
+      <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.12em] text-gold uppercase">
+        <span aria-hidden="true">✦</span> Today&apos;s practice
+      </div>
+      <ReactMarkdown>{text}</ReactMarkdown>
+    </aside>
+  );
+}
 
 /** Splits the model's reply into markdown text and [[ch.v]] verse cards. */
 export default function Reply({ text, streaming }: { text: string; streaming?: boolean }) {
-  // while streaming, hide a half-written tag like "[[2." at the end
-  const clean = streaming ? text.replace(/\[\[[^\]]*$/, "") : text;
+  // while streaming, hide a half-written tag like "[[2." or "[[prac" at the end
+  let clean = streaming ? text.replace(/\[\[[^\]]*$/, "") : text;
+  // pull out the practice (shown as its own card after the text that precedes it)
+  let practice: { before: string; text: string; after: string } | null = null;
+  const pm = clean.match(PRACTICE);
+  if (pm && pm.index !== undefined) {
+    practice = { before: clean.slice(0, pm.index), text: pm[1].trim(), after: clean.slice(pm.index + pm[0].length) };
+    clean = practice.before;
+  }
   const parts: { kind: "md" | "verse"; value: string }[] = [];
   const seen = new Set<string>();
   let last = 0;
@@ -44,6 +65,8 @@ export default function Reply({ text, streaming }: { text: string; streaming?: b
           <ReactMarkdown key={i}>{p.value}</ReactMarkdown>
         ) : null,
       )}
+      {practice && practice.text && <PracticeCard text={practice.text} />}
+      {practice && practice.after.trim() && <Reply text={practice.after} streaming={streaming} />}
     </div>
   );
 }
