@@ -7,7 +7,7 @@ import Welcome from "@/components/Welcome";
 import Sidebar, { type ConvItem } from "@/components/Sidebar";
 import { ConsentDialog, SignInPrompt } from "@/components/Modals";
 import CheckinOffer from "@/components/CheckinOffer";
-import CalmMenu from "@/components/CalmMenu";
+import PracticesMenu from "@/components/PracticesMenu";
 import { STYLES, type Style } from "@/lib/styles";
 import { useAuth } from "@/lib/useAuth";
 import { getBrowserSupabase } from "@/lib/supabase/client";
@@ -399,10 +399,10 @@ export default function Home() {
             <button
               onClick={() => setCalmOpen(true)}
               className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-sm text-muted hover:border-gold hover:text-ink"
-              aria-label="Calm: short breathing practices"
+              aria-label="Calm and Reflect: breathing practices, letters and rituals"
             >
               <span aria-hidden="true">🪔</span>
-              <span className="hidden sm:inline">Calm</span>
+              <span className="hidden sm:inline">Calm &amp; Reflect</span>
             </button>
             <AmbientAudio />
             {auth.enabled && auth.ready && !signedIn && (
@@ -548,12 +548,12 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.8</span>
+            <span className="opacity-60">· v3.9</span>
           </p>
         </footer>
       </div>
 
-      {calmOpen && <CalmMenu onClose={() => setCalmOpen(false)} />}
+      {calmOpen && <PracticesMenu signedIn={Boolean(profile?.consented_at)} onClose={() => setCalmOpen(false)} />}
       {askSignIn && (
         <SignInPrompt
           reason={signInReason}

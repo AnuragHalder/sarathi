@@ -90,3 +90,40 @@ body { font-family: var(--font-inter), system-ui, sans-serif; }
 @media (prefers-reduced-motion: reduce) {
   .nebula { animation: none; }
 }
+
+/* ---------- Reflective exercises: Ahuti (the fire) and the lotus offering ---------- */
+.ahuti-burn {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 60%, transparent 100%);
+  -webkit-mask-size: 100% 250%;
+  mask-size: 100% 250%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: ahuti-burn 3.6s ease-in forwards 0.4s;
+  -webkit-mask-position: 0 0%;
+  mask-position: 0 0%;
+}
+@keyframes ahuti-burn { to { -webkit-mask-position: 0 100%; mask-position: 0 100%; } }
+.ahuti-edge {
+  position: absolute; left: -4%; right: -4%; bottom: 0; height: 46px; pointer-events: none;
+  background: radial-gradient(60% 50% at 50% 50%, rgba(255, 200, 110, 0.95), rgba(251, 120, 40, 0.6) 45%, rgba(251, 80, 20, 0) 75%);
+  filter: blur(4px); opacity: 0;
+  animation: ahuti-edge 3.6s ease-in forwards 0.4s;
+}
+@keyframes ahuti-edge { 0% { bottom: -10px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { bottom: 100%; opacity: 0; } }
+.ahuti-ember {
+  position: absolute; bottom: 10%; border-radius: 9999px; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle, #fff3c4, #fb923c 60%, rgba(251, 146, 60, 0));
+  animation: ahuti-ember 2.6s ease-out forwards;
+}
+@keyframes ahuti-ember { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--drift, 0), -220px); } }
+.ahuti-fade { animation: ahuti-fade 1s ease forwards; }
+@keyframes ahuti-fade { to { opacity: 0; } }
+.petal-rise { animation: petal-rise 2.4s cubic-bezier(.4, 0, .2, 1) forwards; }
+@keyframes petal-rise { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-190px) scale(0.35); } }
+.lotus-glow { animation: lotus-glow 3.6s ease-in-out; }
+@keyframes lotus-glow { 0%, 100% { opacity: 0.6; } 60% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .ahuti-burn, .ahuti-edge, .ahuti-ember { animation: none; }
+  .petal-rise { animation: ahuti-fade 1s ease forwards; }
+}

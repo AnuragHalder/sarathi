@@ -114,6 +114,25 @@ motion. When someone is anxious or overwhelmed, Sarathi may offer one in its rep
 `[[calm:bring-back]]` (at most once per conversation, never in a crisis reply), shown as a tappable card. `/calm`
 lists them too (`/calm?p=bring-back` opens one directly). Free for everyone.
 
+## Reflective exercises (v3.9)
+
+The 🪔 **Calm & Reflect** sheet also holds writing exercises (`src/lib/exercises.ts`, `src/components/exercises/`):
+
+- **Letters** (one flow, different prompts): *Unsent letter*, *Forgiveness letter*, *Letter to your younger self*,
+  *Regret into lesson*. After writing, the person chooses: **Let Sarathi read it** (a reflection, one verse from a
+  short list chosen for that letter type, one small step), **Keep it sealed** (saved, never sent to the AI), or
+  **Release it into the fire** (Ahuti animation; nothing read or saved). After a reading it can still be released: the
+  words are deleted and only Sarathi's reflection stays.
+- **Lay it at Krishna's feet** (2.47, 18.66): list worries → sort "in my hands / not in my hands" → offer the second
+  pile at a golden lotus → choose one thing to do today → Sarathi's reflection.
+- Sarathi never writes as the person a letter is addressed to. The crisis screen runs on every exercise (then: a care
+  message with Tele-MANAS, no AI, no ritual). Sarathi may suggest up to two memory notes; they are saved only if the
+  person taps "Yes, remember" (and only with memory on).
+- Guests can do every exercise; nothing is stored. Signed-in people's exercises are saved in `reflections`
+  (`supabase/004_reflections.sql`) and listed on `/letters`, where any can be deleted.
+- Sarathi can suggest one in chat with `[[reflect:unsent]]`, `[[reflect:forgiveness]]`, `[[reflect:regret]]`,
+  `[[reflect:younger]]` or `[[reflect:feet]]` (at most one practice or exercise per conversation).
+
 ## Background music
 
 Put an MP3 at `public/audio/calm.mp3`. It loops quietly (30% volume, 2.5 s fade-in). Browsers only allow sound
