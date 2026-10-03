@@ -8,7 +8,7 @@ import FeetFlow from "./exercises/FeetFlow";
 import { PRACTICE_LIST, PRACTICES, type PracticeId } from "@/lib/practices";
 import { EXERCISE_LIST, type ExerciseKind } from "@/lib/exercises";
 
-type Open = { type: "calm"; id: PracticeId } | { type: "reflect"; kind: ExerciseKind } | null;
+export type Open = { type: "calm"; id: PracticeId } | { type: "reflect"; kind: ExerciseKind } | null;
 
 /** Opens the chosen practice or exercise. Used by the 🪔 sheet and by cards Sarathi suggests in chat. */
 export function OpenExercise({ open, onClose }: { open: NonNullable<Open>; onClose: () => void }) {

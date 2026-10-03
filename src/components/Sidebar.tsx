@@ -17,6 +17,8 @@ function when(iso: string) {
 }
 
 type Props = {
+  onOpenPractices: () => void;
+  onTour: () => void;
   open: boolean;
   onClose: () => void;
   items: ConvItem[];
@@ -53,6 +55,24 @@ export default function Sidebar(p: Props) {
         >
           <span aria-hidden="true">＋</span> New conversation
         </button>
+        <nav className="mt-3 grid gap-0.5 text-sm" aria-label="Explore">
+          <button onClick={p.onOpenPractices} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-muted hover:bg-surface-2 hover:text-ink">
+            <span aria-hidden="true">🪔</span> Calm &amp; Reflect
+          </button>
+          {p.profile && (
+            <>
+              <Link href="/letters" className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-muted hover:bg-surface-2 hover:text-ink">
+                <span aria-hidden="true">✉️</span> Your letters
+              </Link>
+              <Link href="/memory" className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-muted hover:bg-surface-2 hover:text-ink">
+                <span aria-hidden="true">🧠</span> What Sarathi knows
+              </Link>
+            </>
+          )}
+          <button onClick={p.onTour} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-muted hover:bg-surface-2 hover:text-ink">
+            <span aria-hidden="true">✨</span> How Sarathi works
+          </button>
+        </nav>
       </div>
 
       <nav className="mt-3 flex-1 overflow-y-auto px-2 pb-3" aria-label="Past conversations">
@@ -147,7 +167,7 @@ export default function Sidebar(p: Props) {
   return (
     <>
       {/* Desktop column */}
-      <aside className="hidden w-72 shrink-0 border-r border-line bg-bg/45 backdrop-blur-md lg:block">
+      <aside data-tour="conversations" className="hidden w-72 shrink-0 border-r border-line bg-bg/45 backdrop-blur-md lg:block">
         <div className="sticky top-0 h-dvh">{body}</div>
       </aside>
       {/* Mobile drawer */}

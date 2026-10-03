@@ -127,3 +127,25 @@ body { font-family: var(--font-inter), system-ui, sans-serif; }
   .ahuti-burn, .ahuti-edge, .ahuti-ember { animation: none; }
   .petal-rise { animation: ahuti-fade 1s ease forwards; }
 }
+
+/* ---------- Discoverability: gold highlights and the walkthrough ---------- */
+.glow-gold {
+  border-color: rgba(224, 179, 90, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(224, 179, 90, 0.18), 0 0 14px rgba(224, 179, 90, 0.22);
+}
+.breathe-gold { animation: breathe-gold 4.5s ease-in-out infinite; }
+@keyframes breathe-gold {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(224, 179, 90, 0.18), 0 0 10px rgba(224, 179, 90, 0.18); }
+  50% { box-shadow: 0 0 0 2px rgba(224, 179, 90, 0.45), 0 0 22px rgba(224, 179, 90, 0.45); }
+}
+.new-dot { position: absolute; top: -2px; right: -2px; width: 9px; height: 9px; border-radius: 9999px; background: #e0b35a; box-shadow: 0 0 8px rgba(224, 179, 90, 0.9); }
+.tour-spot {
+  box-shadow: 0 0 0 9999px rgba(4, 3, 9, 0.68), 0 0 0 2px rgba(224, 179, 90, 0.9), 0 0 26px rgba(224, 179, 90, 0.55);
+  transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease;
+}
+.tour-card { animation: tour-in 0.3s ease; }
+@keyframes tour-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .breathe-gold, .tour-card { animation: none; }
+  .tour-spot { transition: none; }
+}

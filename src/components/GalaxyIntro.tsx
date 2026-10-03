@@ -72,7 +72,7 @@ export default function GalaxyIntro() {
     }
 
     function draw(now: number) {
-      const t = (now - start) / 1000;
+      const t = Math.max(0, (now - start) / 1000); // a frame can be stamped slightly before start
       const bloom = calm ? 1 : 1 - Math.pow(1 - Math.min(t / 3.2, 1), 3); // ease-out birth
       ctx!.clearRect(0, 0, w, h);
 
