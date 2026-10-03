@@ -100,6 +100,20 @@ a practice is scheduled automatically (with a "Not this time" link).
 - The owner (`ADMIN_EMAIL`) sees "Send me a test check-in now" on `/memory`.
 - Needs `RESEND_API_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET` and `ADMIN_EMAIL` in Vercel (all Secrets).
 
+## Calm practices (v3.8)
+
+A **Calm** button (🪔) in the header opens short guided practices over the chat, so the background music keeps
+playing. Each is anchored in a verse, shown at the start and the end (`src/lib/practices.ts`):
+
+- **Steady Lamp** (6.19): breathe in 4, out 6, with a diya whose flame rises and settles. 2 or 5 minutes.
+- **Bring It Back** (6.26): count ten out-breaths on a ring of beads; "My mind wandered" returns to one, gently.
+
+`src/components/CalmPlayer.tsx` runs them: on-screen words, a soft singing-bowl chime made with Web Audio (no sound
+file, can be switched off), a light vibration on phones, the screen kept awake, and a still version for reduced
+motion. When someone is anxious or overwhelmed, Sarathi may offer one in its reply with `[[calm:steady-lamp]]` or
+`[[calm:bring-back]]` (at most once per conversation, never in a crisis reply), shown as a tappable card. `/calm`
+lists them too (`/calm?p=bring-back` opens one directly). Free for everyone.
+
 ## Background music
 
 Put an MP3 at `public/audio/calm.mp3`. It loops quietly (30% volume, 2.5 s fade-in). Browsers only allow sound

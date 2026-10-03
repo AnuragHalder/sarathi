@@ -1,11 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import VerseCard from "./VerseCard";
+import CalmPlayer from "./CalmPlayer";
+import { isPracticeId, PRACTICES, type PracticeId } from "@/lib/practices";
 
 const TAG = /\[\[\s*(?:BG\s*)?(\d{1,2})\.(\d{1,2})\s*\]\]/gi;
 // The one practice, written by Sarathi as [[practice]] … [[/practice]]. While streaming it may still be open.
 const PRACTICE = /\[\[\s*practice\s*\]\]([\s\S]*?)(?:\[\[\s*\/\s*practice\s*\]\]|$)/i;
+
+// A calm practice Sarathi suggests: [[calm:steady-lamp]] or [[calm:bring-back]].
+const CALM = /\[\[\s*calm\s*:\s*([a-z-]+)\s*\]\]/gi;
+
+/** A tappable card that opens a calm practice right here, without leaving the conversation. */
+function CalmCard({ id }: { id: PracticeId }) {
+  const [open, setOpen] = useState(false);
+  const p = PRACTICES[id];
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="my-3 flex w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-left transition hover:border-gold"
+      >
+        <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-xl">🪔</span>
+        <span className="min-w-0">
+          <span className="block font-serif text-lg font-semibold">Try {p.name} · {p.minutes[0]} min</span>
+          <span className="block text-sm text-muted">{p.tagline}</span>
+        </span>
+      </button>
+      {open && <CalmPlayer practice={p} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
 
 /** A highlighted card for today's practice. */
 function PracticeCard({ text }: { text: string }) {
@@ -23,6 +50,9 @@ function PracticeCard({ text }: { text: string }) {
 export default function Reply({ text, streaming }: { text: string; streaming?: boolean }) {
   // while streaming, hide a half-written tag like "[[2." or "[[prac" at the end
   let clean = streaming ? text.replace(/\[\[[^\]]*$/, "") : text;
+  // suggested calm practice (at most one card), wherever the tag was written
+  const calmId = [...clean.matchAll(CALM)].map((m) => m[1].toLowerCase()).find(isPracticeId);
+  clean = clean.replace(CALM, "");
   // pull out the practice (shown as its own card after the text that precedes it)
   let practice: { before: string; text: string; after: string } | null = null;
   const pm = clean.match(PRACTICE);
@@ -67,6 +97,7 @@ export default function Reply({ text, streaming }: { text: string; streaming?: b
       )}
       {practice && practice.text && <PracticeCard text={practice.text} />}
       {practice && practice.after.trim() && <Reply text={practice.after} streaming={streaming} />}
+      {calmId && !streaming && <CalmCard id={calmId} />}
     </div>
   );
 }
