@@ -133,6 +133,17 @@ The 🪔 **Calm & Reflect** sheet also holds writing exercises (`src/lib/exercis
 - Sarathi can suggest one in chat with `[[reflect:unsent]]`, `[[reflect:forgiveness]]`, `[[reflect:regret]]`,
   `[[reflect:younger]]` or `[[reflect:feet]]` (at most one practice or exercise per conversation).
 
+## Discoverability (v3.10)
+
+- Header: 🪔 Calm & Reflect and 🔊 Music have a soft gold glow; Calm & Reflect also "breathes" and shows a gold
+  dot until it's first opened. **Sign in** is a filled gold button, now visible on phones too.
+- Home screen: an "Or try" row (🪔 Steady Lamp · ✉️ Unsent letter · 🪷 Lay it at Krishna's feet).
+- Side panel: Calm & Reflect, Your letters, What Sarathi knows, How Sarathi works.
+- Walkthrough (`src/components/Tour.tsx`, steps in `src/lib/tours.ts`): a spotlight tour with Skip/Back/Next.
+  Guests see 6 steps after the welcome screen; signed-in people see 3 member steps once (after the privacy consent).
+  Shown once per device (localStorage); "How Sarathi works" in the footer and side panel replays it. Steps whose
+  feature isn't on screen are skipped. Escape skips; arrow keys move.
+
 ## Background music
 
 Put an MP3 at `public/audio/calm.mp3`. It loops quietly (30% volume, 2.5 s fade-in). Browsers only allow sound

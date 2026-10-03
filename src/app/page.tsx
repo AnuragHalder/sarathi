@@ -7,7 +7,10 @@ import Welcome from "@/components/Welcome";
 import Sidebar, { type ConvItem } from "@/components/Sidebar";
 import { ConsentDialog, SignInPrompt } from "@/components/Modals";
 import CheckinOffer from "@/components/CheckinOffer";
-import PracticesMenu from "@/components/PracticesMenu";
+import PracticesMenu, { OpenExercise, type Open } from "@/components/PracticesMenu";
+import Tour from "@/components/Tour";
+import { BEGIN_EVENT } from "@/components/Welcome";
+import { GUEST_TOUR, MEMBER_TOUR, PRACTICES_SEEN_KEY, TOUR_KEYS } from "@/lib/tours";
 import { STYLES, type Style } from "@/lib/styles";
 import { useAuth } from "@/lib/useAuth";
 import { getBrowserSupabase } from "@/lib/supabase/client";
@@ -20,6 +23,13 @@ import {
   titleFrom,
   type ChatMsg,
 } from "@/lib/guest";
+
+/** One-tap ways into Calm & Reflect from the home screen. */
+const SHORTCUTS: { icon: string; label: string; open: NonNullable<Open> }[] = [
+  { icon: "🪔", label: "Steady Lamp", open: { type: "calm", id: "steady-lamp" } },
+  { icon: "✉️", label: "Unsent letter", open: { type: "reflect", kind: "unsent" } },
+  { icon: "🪷", label: "Lay it at Krishna's feet", open: { type: "reflect", kind: "feet" } },
+];
 
 /** Gentle starts: tapping one begins the message in the person's own words; they carry on typing. */
 const TOPICS: { label: string; starter: string }[] = [
@@ -55,6 +65,9 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [askSignIn, setAskSignIn] = useState(false);
   const [calmOpen, setCalmOpen] = useState(false);
+  const [exercise, setExercise] = useState<Open>(null);
+  const [tour, setTour] = useState<"guest" | "member" | null>(null);
+  const [practicesSeen, setPracticesSeen] = useState(true);
   const [guestUsed, setGuestUsed] = useState(0);
   const [authError, setAuthError] = useState(false);
   const currentIdRef = useRef<string | null>(null);
@@ -81,6 +94,56 @@ export default function Home() {
     setCurrentId(id);
     setUrlChat(id);
   };
+
+  // ---- discoverability: the "new" dot on Calm & Reflect, and the first-visit walkthrough
+  const seen = (k: string) => {
+    try {
+      return localStorage.getItem(k) === "1";
+    } catch {
+      return true;
+    }
+  };
+  const markSeen = (k: string) => {
+    try {
+      localStorage.setItem(k, "1");
+    } catch {}
+  };
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read the saved flag after hydration
+    setPracticesSeen(seen(PRACTICES_SEEN_KEY));
+  }, []);
+  function openPractices() {
+    markSeen(PRACTICES_SEEN_KEY);
+    setPracticesSeen(true);
+    setCalmOpen(true);
+  }
+  function openExercise(o: NonNullable<Open>) {
+    markSeen(PRACTICES_SEEN_KEY);
+    setPracticesSeen(true);
+    setExercise(o);
+  }
+  function startTour() {
+    setSidebarOpen(false);
+    window.scrollTo({ top: 0 });
+    setTour(signedIn ? "member" : "guest");
+  }
+  function endTour() {
+    if (tour) markSeen(TOUR_KEYS[tour]);
+    setTour(null);
+  }
+  // Show the tour once: guests after the welcome screen, members after their first sign-in (privacy consent).
+  useEffect(() => {
+    if (!auth.ready || tour) return;
+    const kind = profile?.consented_at ? "member" : profile ? null : "guest";
+    if (!kind || seen(TOUR_KEYS[kind]) || new URL(window.location.href).searchParams.get("c")) return;
+    if (kind === "guest" && !seen("sarathi-welcomed")) {
+      const onBegin = () => window.setTimeout(() => setTour("guest"), 900);
+      window.addEventListener(BEGIN_EVENT, onBegin, { once: true });
+      return () => window.removeEventListener(BEGIN_EVENT, onBegin);
+    }
+    const t = window.setTimeout(() => setTour(kind), 900);
+    return () => window.clearTimeout(t);
+  }, [auth.ready, profile, tour]);
 
   // ---- preferences
   useEffect(() => {
@@ -367,6 +430,11 @@ export default function Home() {
           await auth.signOut();
           newChat();
         }}
+        onOpenPractices={() => {
+          setSidebarOpen(false);
+          openPractices();
+        }}
+        onTour={startTour}
       />
 
       <div className="mx-auto flex min-h-dvh w-full min-w-0 max-w-2xl flex-col">
@@ -376,6 +444,7 @@ export default function Home() {
               onClick={() => setSidebarOpen(true)}
               className="-ml-1 rounded-full p-2 text-muted hover:text-ink lg:hidden"
               aria-label="Open your conversations"
+              data-tour="conversations"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                 <path d="M4 7h16M4 12h16M4 17h10" />
@@ -392,23 +461,29 @@ export default function Home() {
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {!empty && (
-              <button onClick={newChat} className="rounded-full border border-line px-3 py-1 text-sm text-muted hover:text-ink">
-                New chat
+              <button onClick={newChat} className="rounded-full border border-line px-2.5 py-1 text-sm text-muted hover:text-ink" aria-label="New chat">
+                <span aria-hidden="true" className="sm:hidden">＋</span>
+                <span className="hidden sm:inline">New chat</span>
               </button>
             )}
             <button
-              onClick={() => setCalmOpen(true)}
-              className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-sm text-muted hover:border-gold hover:text-ink"
+              onClick={openPractices}
+              data-tour="practices"
+              className={`glow-gold relative flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm text-ink hover:text-gold ${practicesSeen ? "" : "breathe-gold"}`}
               aria-label="Calm and Reflect: breathing practices, letters and rituals"
             >
               <span aria-hidden="true">🪔</span>
               <span className="hidden sm:inline">Calm &amp; Reflect</span>
+              {!practicesSeen && <span className="new-dot" aria-label="New" />}
             </button>
-            <AmbientAudio />
+            <span data-tour="music" className="rounded-full">
+              <AmbientAudio />
+            </span>
             {auth.enabled && auth.ready && !signedIn && (
               <button
-                onClick={() => auth.signIn()}
-                className="hidden rounded-full border border-line px-3 py-1 text-sm text-muted hover:text-ink sm:block"
+                onClick={() => auth.signIn(window.location.pathname + window.location.search)}
+                data-tour="signin"
+                className="shrink-0 rounded-full bg-accent px-3 py-1 text-sm font-medium text-[#1b120a] shadow-[0_0_14px_rgba(251,146,60,0.35)]"
               >
                 Sign in
               </button>
@@ -435,7 +510,7 @@ export default function Home() {
               </p>
 
               <h2 className="mt-8 mb-2 text-sm font-medium text-muted">What is it about?</h2>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2" data-tour="topics">
                 {TOPICS.map((t) => (
                   <button
                     key={t.label}
@@ -446,8 +521,21 @@ export default function Home() {
                   </button>
                 ))}
               </div>
+              <h2 className="mt-5 mb-2 text-sm font-medium text-muted">Or try</h2>
+              <div className="flex flex-wrap gap-2" data-tour="shortcuts">
+                {SHORTCUTS.map((sc) => (
+                  <button
+                    key={sc.label}
+                    onClick={() => openExercise(sc.open)}
+                    className="glow-gold flex items-center gap-1.5 rounded-full border bg-surface px-3.5 py-2 text-sm hover:text-gold"
+                  >
+                    <span aria-hidden="true">{sc.icon}</span>
+                    {sc.label}
+                  </button>
+                ))}
+              </div>
               <h2 className="mt-8 mb-2 text-sm font-medium text-muted">Choose how you&apos;d like guidance</h2>
-              <div className="grid gap-2 sm:grid-cols-3">
+              <div className="grid gap-2 sm:grid-cols-3" data-tour="styles">
                 {(Object.keys(STYLES) as Style[]).map((k) => (
                   <button
                     key={k}
@@ -548,11 +636,17 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.9</span>
+            ·{" "}
+            <button onClick={startTour} className="underline">
+              How Sarathi works
+            </button>{" "}
+            <span className="opacity-60">· v3.10</span>
           </p>
         </footer>
       </div>
 
+      {exercise && <OpenExercise open={exercise} onClose={() => setExercise(null)} />}
+      {tour && <Tour steps={tour === "member" ? MEMBER_TOUR : GUEST_TOUR} onDone={endTour} />}
       {calmOpen && <PracticesMenu signedIn={Boolean(profile?.consented_at)} onClose={() => setCalmOpen(false)} />}
       {askSignIn && (
         <SignInPrompt

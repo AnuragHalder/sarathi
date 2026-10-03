@@ -228,7 +228,7 @@ export default function AmbientAudio() {
           muted ? "Music is off. Open music controls" : waiting ? "Music starts when you tap. Open music controls" : "Music is playing. Open music controls"
         }
         aria-expanded={open}
-        className={`flex h-9 w-9 items-center justify-center rounded-full border border-line hover:text-ink ${
+        className={`glow-gold flex h-9 w-9 items-center justify-center rounded-full border hover:text-ink ${
           waiting ? "animate-pulse text-accent" : muted ? "text-muted" : "text-accent"
         }`}
       >
