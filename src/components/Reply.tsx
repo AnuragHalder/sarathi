@@ -3,33 +3,37 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import VerseCard from "./VerseCard";
-import CalmPlayer from "./CalmPlayer";
+import { OpenExercise } from "./PracticesMenu";
 import { isPracticeId, PRACTICES, type PracticeId } from "@/lib/practices";
+import { EXERCISES, isExerciseKind, type ExerciseKind } from "@/lib/exercises";
 
 const TAG = /\[\[\s*(?:BG\s*)?(\d{1,2})\.(\d{1,2})\s*\]\]/gi;
 // The one practice, written by Sarathi as [[practice]] … [[/practice]]. While streaming it may still be open.
 const PRACTICE = /\[\[\s*practice\s*\]\]([\s\S]*?)(?:\[\[\s*\/\s*practice\s*\]\]|$)/i;
 
-// A calm practice Sarathi suggests: [[calm:steady-lamp]] or [[calm:bring-back]].
-const CALM = /\[\[\s*calm\s*:\s*([a-z-]+)\s*\]\]/gi;
+// A practice Sarathi suggests: [[calm:steady-lamp]], [[calm:bring-back]], or an exercise like [[reflect:unsent]].
+const SUGGEST = /\[\[\s*(calm|reflect)\s*:\s*([a-z-]+)\s*\]\]/gi;
+type Suggestion = { type: "calm"; id: PracticeId } | { type: "reflect"; kind: ExerciseKind };
 
-/** A tappable card that opens a calm practice right here, without leaving the conversation. */
-function CalmCard({ id }: { id: PracticeId }) {
+/** A tappable card that opens the practice right here, without leaving the conversation. */
+function SuggestionCard({ s }: { s: Suggestion }) {
   const [open, setOpen] = useState(false);
-  const p = PRACTICES[id];
+  const title = s.type === "calm" ? `Try ${PRACTICES[s.id].name} · ${PRACTICES[s.id].minutes[0]} min` : EXERCISES[s.kind].name;
+  const text = s.type === "calm" ? PRACTICES[s.id].tagline : EXERCISES[s.kind].tagline;
+  const icon = s.type === "calm" ? "🪔" : s.kind === "feet" ? "🪷" : "✉️";
   return (
     <>
       <button
         onClick={() => setOpen(true)}
         className="my-3 flex w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-left transition hover:border-gold"
       >
-        <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-xl">🪔</span>
+        <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-xl">{icon}</span>
         <span className="min-w-0">
-          <span className="block font-serif text-lg font-semibold">Try {p.name} · {p.minutes[0]} min</span>
-          <span className="block text-sm text-muted">{p.tagline}</span>
+          <span className="block font-serif text-lg font-semibold">{title}</span>
+          <span className="block text-sm text-muted">{text}</span>
         </span>
       </button>
-      {open && <CalmPlayer practice={p} onClose={() => setOpen(false)} />}
+      {open && <OpenExercise open={s} onClose={() => setOpen(false)} />}
     </>
   );
 }
@@ -50,9 +54,15 @@ function PracticeCard({ text }: { text: string }) {
 export default function Reply({ text, streaming }: { text: string; streaming?: boolean }) {
   // while streaming, hide a half-written tag like "[[2." or "[[prac" at the end
   let clean = streaming ? text.replace(/\[\[[^\]]*$/, "") : text;
-  // suggested calm practice (at most one card), wherever the tag was written
-  const calmId = [...clean.matchAll(CALM)].map((m) => m[1].toLowerCase()).find(isPracticeId);
-  clean = clean.replace(CALM, "");
+  // a suggested practice or exercise (at most one card), wherever the tag was written
+  let suggestion: Suggestion | null = null;
+  for (const m of clean.matchAll(SUGGEST)) {
+    const [type, id] = [m[1].toLowerCase(), m[2].toLowerCase()];
+    if (type === "calm" && isPracticeId(id)) suggestion = { type: "calm", id };
+    else if (type === "reflect" && isExerciseKind(id)) suggestion = { type: "reflect", kind: id };
+    if (suggestion) break;
+  }
+  clean = clean.replace(SUGGEST, "");
   // pull out the practice (shown as its own card after the text that precedes it)
   let practice: { before: string; text: string; after: string } | null = null;
   const pm = clean.match(PRACTICE);
@@ -97,7 +107,7 @@ export default function Reply({ text, streaming }: { text: string; streaming?: b
       )}
       {practice && practice.text && <PracticeCard text={practice.text} />}
       {practice && practice.after.trim() && <Reply text={practice.after} streaming={streaming} />}
-      {calmId && !streaming && <CalmCard id={calmId} />}
+      {suggestion && !streaming && <SuggestionCard s={suggestion} />}
     </div>
   );
 }

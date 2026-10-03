@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Privacy policy · Sarathi" };
 
 // Have this reviewed (ideally by a lawyer familiar with India's DPDP Act) as the app grows.
 const CONTACT_EMAIL = "anurag.economics@gmail.com";
-const UPDATED = "1 October 2026";
+const UPDATED = "3 October 2026";
 
 export default function Privacy() {
   return (
@@ -28,6 +28,7 @@ export default function Privacy() {
           <li><strong>Your conversations</strong>: the messages you send and Sarathi&apos;s replies.</li>
           <li><strong>Memory notes</strong> (only if memory is on): short notes drawn from your conversations, such as an ongoing situation or what has helped you.</li>
           <li><strong>Settings</strong>: your preferred guidance style, memory on/off, check-in emails on/off, and your consent record.</li>
+          <li><strong>Letters and reflective exercises</strong> (signed-in only): what you write, unless you release it into the fire (then the words are deleted). Sealed letters are stored but never sent to the AI. As a guest, nothing you write in an exercise is stored.</li>
           <li><strong>Check-ins</strong> (only if you turn them on): the practice Sarathi suggested, when the follow-up email was sent, and the answer you tapped (for example &ldquo;It helped&rdquo;).</li>
           <li>If you use Sarathi without signing in, your conversations stay in your browser and are not stored on our servers.</li>
         </ul>
@@ -52,7 +53,7 @@ export default function Privacy() {
         <h2>Your choices and rights</h2>
         <ul>
           <li>View, edit or delete any memory note, or switch memory off, on the <Link href="/memory" className="text-accent underline">What Sarathi knows</Link> page.</li>
-          <li>Delete any conversation from the side panel.</li>
+          <li>Delete any conversation from the side panel, and any letter on the &ldquo;Your letters&rdquo; page.</li>
           <li>Stop check-in emails with the link in any email, or switch them off on the same page.</li>
           <li>Delete your account and all your data at any time from the same page. This is permanent.</li>
           <li>Withdraw consent at any time by switching memory off or deleting your account.</li>
