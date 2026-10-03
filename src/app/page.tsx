@@ -7,6 +7,7 @@ import Welcome from "@/components/Welcome";
 import Sidebar, { type ConvItem } from "@/components/Sidebar";
 import { ConsentDialog, SignInPrompt } from "@/components/Modals";
 import CheckinOffer from "@/components/CheckinOffer";
+import CalmMenu from "@/components/CalmMenu";
 import { STYLES, type Style } from "@/lib/styles";
 import { useAuth } from "@/lib/useAuth";
 import { getBrowserSupabase } from "@/lib/supabase/client";
@@ -53,6 +54,7 @@ export default function Home() {
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [askSignIn, setAskSignIn] = useState(false);
+  const [calmOpen, setCalmOpen] = useState(false);
   const [guestUsed, setGuestUsed] = useState(0);
   const [authError, setAuthError] = useState(false);
   const currentIdRef = useRef<string | null>(null);
@@ -394,6 +396,14 @@ export default function Home() {
                 New chat
               </button>
             )}
+            <button
+              onClick={() => setCalmOpen(true)}
+              className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-sm text-muted hover:border-gold hover:text-ink"
+              aria-label="Calm: short breathing practices"
+            >
+              <span aria-hidden="true">🪔</span>
+              <span className="hidden sm:inline">Calm</span>
+            </button>
             <AmbientAudio />
             {auth.enabled && auth.ready && !signedIn && (
               <button
@@ -538,11 +548,12 @@ export default function Home() {
             <a href="/privacy" className="underline">
               Privacy
             </a>{" "}
-            <span className="opacity-60">· v3.7</span>
+            <span className="opacity-60">· v3.8</span>
           </p>
         </footer>
       </div>
 
+      {calmOpen && <CalmMenu onClose={() => setCalmOpen(false)} />}
       {askSignIn && (
         <SignInPrompt
           reason={signInReason}

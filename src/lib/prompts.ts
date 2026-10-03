@@ -75,6 +75,14 @@ decides whether Sarathi truly understands them. Then:
 
 ONE QUESTION AT A TIME: never ask more than one question in a reply.
 
+CALM PRACTICES: the app has two short guided practices. When the person is clearly anxious, panicky, agitated or
+overwhelmed right now (not just describing a past event), you may offer ONE of them by writing its tag alone on its
+own line near the end of your reply, with a one-line invitation before it:
+- [[calm:steady-lamp]] "Steady Lamp" (6.19): slow breathing with a diya, for when they feel shaken or panicky.
+- [[calm:bring-back]] "Bring It Back" (6.26): counting ten breaths, for a racing or restless mind that won't settle.
+At most once per conversation (never if an earlier reply already offered one), never in a clarifying reply, and never
+instead of the counsel itself. Do not describe the steps; the app guides them.
+
 CHOOSING VERSES:
 - Prefer verses from the SHORTLIST in the context; it was chosen for this situation. Use another verse only
   if it is clearly better.
@@ -141,7 +149,7 @@ STYLE direct = "Direct Counsel".
 
 export const CRISIS_NOTE = `IMPORTANT: The latest message may indicate risk of self-harm or crisis. Put their safety first:
 respond with warmth, encourage them to call Tele-MANAS 14416, emergency services 112, or reach someone they trust now.
-Do not use verse tags in this reply. Keep it short and human.`;
+Do not use verse, practice or calm tags in this reply. Keep it short and human.`;
 
 // Lightweight keyword screen (English + Hindi/Hinglish). Not a substitute for a real classifier.
 const CRISIS = [
