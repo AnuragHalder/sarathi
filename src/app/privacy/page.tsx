@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Privacy policy · Sarathi" };
 
 // Have this reviewed (ideally by a lawyer familiar with India's DPDP Act) as the app grows.
-const CONTACT_EMAIL = "anurag.economics@gmail.com";
-const UPDATED = "3 October 2026";
+const UPDATED = "4 October 2026";
 
 export default function Privacy() {
   return (

@@ -637,10 +637,22 @@ export default function Home() {
               Privacy
             </a>{" "}
             ·{" "}
+            <a href="/terms" className="underline">
+              Terms
+            </a>{" "}
+            ·{" "}
+            <a href="/refunds" className="underline">
+              Refunds
+            </a>{" "}
+            ·{" "}
+            <a href="/contact" className="underline">
+              Contact
+            </a>{" "}
+            ·{" "}
             <button onClick={startTour} className="underline">
               How Sarathi works
             </button>{" "}
-            <span className="opacity-60">· v3.10</span>
+            <span className="opacity-60">· v3.11</span>
           </p>
         </footer>
       </div>

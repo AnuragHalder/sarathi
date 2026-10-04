@@ -40,9 +40,7 @@ export default function VerseCard({ id }: { id: string }) {
       try {
         const r = await fetch(`/commentary/${id}.json`);
         const data: Comm[] = await r.json();
-        // English first, then Hindi, then Sanskrit
-        const order: Record<string, number> = { ec: 0, et: 1, hc: 2, ht: 3, sc: 4 };
-        data.sort((a, b) => (order[a.type] ?? 9) - (order[b.type] ?? 9));
+        // The ancient acharyas' own Sanskrit commentaries (public domain), most widely studied first.
         setComms(data);
       } catch {
         setErr(true);
@@ -79,20 +77,20 @@ export default function VerseCard({ id }: { id: string }) {
         </div>
         <blockquote className="mt-2 border-l-2 border-gold pl-3 leading-relaxed">
           {tab === "en" ? v.translation : v.hindi || v.translation}
-          <footer className="mt-1 text-xs text-muted">
-            {tab === "hi" && v.hindi ? "Swami Tejomayananda" : `Tr. ${v.translationBy}`}
-          </footer>
+          <footer className="mt-1 text-xs text-muted">Sarathi&apos;s rendering</footer>
         </blockquote>
 
         <button onClick={toggleCommentary} className="mt-3 text-sm font-medium text-accent hover:underline">
-          {open ? "Hide commentaries ▲" : "Read commentaries ▼"}
+          {open ? "Hide the acharyas' commentaries ▲" : "Read the acharyas' commentaries ▼"}
         </button>
         {open && (
           <div className="mt-2 rounded-xl bg-surface-2 p-3">
             {err && <p className="text-sm text-muted">Couldn&apos;t load commentaries.</p>}
             {!comms && !err && <p className="text-sm text-muted">Loading…</p>}
+            {comms && comms.length === 0 && <p className="text-sm text-muted">No commentary on this verse.</p>}
             {comms && comms.length > 0 && (
               <>
+                <p className="mb-2 text-xs text-muted">The original Sanskrit commentaries of the great acharyas.</p>
                 <select
                   value={pick}
                   onChange={(e) => setPick(Number(e.target.value))}
@@ -101,13 +99,14 @@ export default function VerseCard({ id }: { id: string }) {
                 >
                   {comms.map((x, i) => (
                     <option key={i} value={i}>
-                      {x.author} · {x.label}
+                      {x.author}
                     </option>
                   ))}
                 </select>
                 {c && (
                   <p
-                    className={`mt-3 max-h-72 overflow-y-auto text-sm leading-relaxed whitespace-pre-line ${c.type === "sc" || c.type.startsWith("h") ? "font-deva" : ""}`}
+                    className="mt-3 max-h-72 overflow-y-auto font-deva text-sm leading-relaxed whitespace-pre-line"
+                    lang="sa"
                   >
                     {c.text}
                   </p>
