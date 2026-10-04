@@ -176,12 +176,26 @@ The cleanup drops the 18 chapter colophons and ~1,400 "did not comment" placehol
 (`saṅgo.astv` → `saṅgo'stv`), strips verse-number prefixes and translator notes, restores the "qu" the source
 lost in ~150 English words ("eanimity" → "equanimity"), and skips copy-error translations (e.g. 18.45).
 
-## Content & licensing (before public launch)
+## Content & licensing (v3.11)
 
-Verse data comes from [vedicscriptures/bhagavad-gita](https://github.com/vedicscriptures/bhagavad-gita) (GPL-3.0).
-Several bundled translations and commentaries (e.g. Prabhupada/BBT, Gambirananda/Advaita Ashrama, Chinmayananda,
-Ramsukhdas/Gita Press, Sivananda/DLS) are copyrighted by their publishers. The MVP includes everything for a
-private beta. Review permissions (and the GPL implications) before a public launch.
+Everything the app shows or sends to the AI is either public domain or Sarathi's own:
+
+- **Sanskrit verses + transliteration**: public domain, from [vedicscriptures/bhagavad-gita](https://github.com/vedicscriptures/bhagavad-gita)
+  (a few garbled transliterations corrected in `scripts/build-data.mjs`).
+- **English and Hindi lines**: Sarathi's own translation, written from the Sanskrit: `data-src/sarathi-translation.json`
+  (`{id, en, hi}` for all 701 verses). It was checked against the modern translations in the source repo: no line shares
+  more than 9 consecutive words with any of them (most share 3–6, as any two literal translations do).
+- **Commentaries**: only the ancient acharyas' Sanskrit originals (Shankara, Ramanuja, Madhva, Sridhara, Madhusudana
+  Saraswati and others). Sarathi reads Shankara, Ramanuja, Sridhara and Madhva before replying and explains them in its
+  own words. Abhinavagupta is left out (the source text carries a modern editor's notes).
+- **Not used any more**: every modern translation and English/Hindi commentary in the source repo (Gambirananda,
+  Adidevananda, Sivananda, Prabhupada, Tejomayananda, Ramsukhdas, Chinmayananda, Sankaranarayan, Purohit Swami), and the
+  repo's chapter summaries (replaced by Sarathi's own chapter titles).
+- `/about-text` explains this publicly; `/terms`, `/refunds` and `/contact` are in place for Razorpay.
+
+Still to check outside the code: the background music's licence (commercial use), a trademark search for "Sarathi",
+and a lawyer's look at the Terms and Privacy pages. Earlier versions of the copyrighted data remain in this repository's
+git history, so keep the GitHub repository private.
 
 ## Known limitations / next steps
 
