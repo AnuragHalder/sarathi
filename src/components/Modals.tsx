@@ -28,12 +28,13 @@ export function SignInPrompt({
       {reason === "checkin" ? (
         <p className="mt-2 text-muted">
           Sign in with the same Google account you use for Sarathi, and your answer will be shared with Sarathi in that
-          conversation.
+          conversation. It stays private, only for you.
         </p>
       ) : (
         <p className="mt-2 text-muted">
-          You&apos;ve used your free guest conversations. Sign in with Google (it&apos;s free) to keep going. Your
-          conversations so far will be saved to your account, and Sarathi will start to remember what matters to you.
+          You&apos;ve used your free guest conversations. Sign in with Google (it&apos;s free) to keep going. Sarathi will
+          remember you, so you never have to explain things twice. Only you can see your conversations and what Sarathi
+          remembers, and you can delete anything.
         </p>
       )}
       <GoogleButton onClick={onSignIn} className="mt-5 w-full" />
@@ -60,7 +61,9 @@ export function ConsentDialog({
   return (
     <Shell label="Before we begin">
       <h2 className="font-serif text-2xl font-semibold">Welcome{name ? `, ${name.split(" ")[0]}` : ""}</h2>
-      <p className="mt-2 text-sm text-muted">Before we begin, here&apos;s what Sarathi keeps and why:</p>
+      <p className="mt-2 text-sm text-muted">
+        Everything you share here is private, only for you. Here&apos;s what Sarathi keeps and why:
+      </p>
       <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm">
         <li>Your name, email and photo from Google, to sign you in.</li>
         <li>Your conversations, so you can come back to them. You can delete any of them at any time.</li>
@@ -68,11 +71,13 @@ export function ConsentDialog({
           If memory is on: short notes about your situation (e.g. &ldquo;preparing for exams in November&rdquo;) so
           guidance gets more personal. You can view, delete or switch these off any time.
         </li>
-        <li>Nothing is sold or used for ads. Messages are processed by OpenAI to write replies.</li>
+        <li>
+          Nothing is sold, used for ads, or used to train AI. Messages are processed by OpenAI only to write your replies.
+        </li>
       </ul>
       <label className="mt-4 flex items-start gap-3 text-sm">
         <input type="checkbox" checked={memory} onChange={(e) => setMemory(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--accent)]" />
-        <span>Let Sarathi remember what I share, to make guidance more personal</span>
+        <span>Let Sarathi remember what matters, so it can help me better (I decide what it keeps)</span>
       </label>
       <label className="mt-3 flex items-start gap-3 text-sm">
         <input type="checkbox" checked={adult} onChange={(e) => setAdult(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--accent)]" />

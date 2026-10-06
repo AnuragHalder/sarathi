@@ -110,8 +110,9 @@ export default function MemoryPage() {
       {profile && (
         <>
           <p className="mt-2 text-muted">
-            Sarathi keeps short notes from your conversations so its guidance can be more personal. Only you can see
-            them. Delete anything you don&apos;t want remembered.
+            The more Sarathi knows, the more personal its guidance. It keeps short notes from your conversations, and
+            they stay between you and Sarathi: only you can see them, they&apos;re never sold or used to train AI. Delete
+            anything you don&apos;t want remembered.
           </p>
 
           <section className="mt-6 flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface p-4">

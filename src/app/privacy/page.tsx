@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { CONTACT_EMAIL } from "@/lib/site";
+import { MEMORY_PROMISE, PRIVACY_PROMISES } from "@/lib/privacyPromises";
 
 export const metadata: Metadata = { title: "Privacy policy · Sarathi" };
 
@@ -21,6 +22,16 @@ export default function Privacy() {
           Sarathi is a reflective companion that offers guidance inspired by the Bhagavad Gita. It is not a medical,
           psychological or legal service. This policy explains what we collect, why, and the choices you have.
         </p>
+
+        <h2>Our promises, in plain words</h2>
+        <ul>
+          {PRIVACY_PROMISES.map((p) => (
+            <li key={p.title}>
+              <strong>{p.title}.</strong> {p.text}
+            </li>
+          ))}
+        </ul>
+        <p>{MEMORY_PROMISE}</p>
 
         <h2>What we collect</h2>
         <ul>

@@ -57,7 +57,7 @@ export function renderCheckinEmail({ words: w, practice, verse, links }: EmailIn
     <p style="margin:24px 0 8px;color:#6f6252;font-size:15px;">${esc(w.signoff)}<br>Sarathi</p>
   </td></tr>
   <tr><td style="border-top:1px solid #efe4cf;padding:14px 26px 22px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.55;color:#8b7d6a;">
-    You're receiving this because you asked Sarathi to check in with you. Replies to this email aren't read; tap the buttons above to talk to Sarathi.
+    You're receiving this because you asked Sarathi to check in with you. Your conversations stay private: we never put what you shared in a subject line. Replies to this email aren't read; tap the buttons above to talk to Sarathi.
     <a href="${esc(links.stop)}" style="color:#8b5a14;">Stop check-in emails</a> &middot; <a href="${esc(links.privacy)}" style="color:#8b5a14;">Privacy</a><br>
     Sarathi offers reflections, not professional advice. If you are struggling right now, call Tele-MANAS on 14416 (free, 24x7).
   </td></tr>

@@ -144,6 +144,15 @@ The 🪔 **Calm & Reflect** sheet also holds writing exercises (`src/lib/exercis
   Shown once per device (localStorage); "How Sarathi works" in the footer and side panel replays it. Steps whose
   feature isn't on screen are skipped. Escape skips; arrow keys move.
 
+## Privacy messaging (v3.12)
+
+Sarathi's privacy promises live in one place, `src/lib/privacyPromises.ts`, and every line there must stay true of the
+app (no absolute claims like "never leaked"). They appear in: the 🔒 line above the message box and the "Private" chip
+in the header (both open the "Your privacy, in plain words" sheet), a trust pill on the home screen, the welcome screen
+(Private · Judgement-free · Free to talk), the first step of both walkthroughs (tour keys bumped to v2 so everyone sees
+it once), the sign-in prompt and consent screen, the "What Sarathi knows" page, the top of the privacy policy, and the
+check-in email footer.
+
 ## Background music
 
 Put an MP3 at `public/audio/calm.mp3`. It loops quietly (30% volume, 2.5 s fade-in). Browsers only allow sound
