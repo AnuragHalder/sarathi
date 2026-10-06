@@ -51,6 +51,13 @@ export default function Welcome() {
           Sarathi
         </h1>
         <p className="mt-1 text-muted">Guidance from the Bhagavad Gita</p>
+        <p className="mt-3 flex flex-wrap items-center justify-center gap-x-2 text-sm text-gold">
+          <span>🔒 Private</span>
+          <span aria-hidden="true">·</span>
+          <span>Judgement-free</span>
+          <span aria-hidden="true">·</span>
+          <span>Free to talk</span>
+        </p>
         <p className="mt-6 font-deva text-lg leading-relaxed text-gold" lang="sa">
           कर्मण्येवाधिकारस्ते मा फलेषु कदाचन
         </p>

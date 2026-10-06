@@ -152,7 +152,7 @@ export default function Sidebar(p: Props) {
           <div className="rounded-xl bg-surface-2 p-3">
             <p className="text-sm">
               {p.guestLeft > 0
-                ? `Sign in to save your conversations and let Sarathi remember you. ${p.guestLeft} free ${p.guestLeft === 1 ? "chat" : "chats"} left as a guest.`
+                ? `Sign in to save your conversations privately and let Sarathi remember you. ${p.guestLeft} free ${p.guestLeft === 1 ? "chat" : "chats"} left as a guest.`
                 : "Sign in to keep talking. Your conversations so far will be saved to your account."}
             </p>
             <GoogleButton onClick={p.onSignIn} className="mt-3 w-full" />

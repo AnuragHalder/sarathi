@@ -9,6 +9,7 @@ import { ConsentDialog, SignInPrompt } from "@/components/Modals";
 import CheckinOffer from "@/components/CheckinOffer";
 import PracticesMenu, { OpenExercise, type Open } from "@/components/PracticesMenu";
 import Tour from "@/components/Tour";
+import PrivacySheet from "@/components/PrivacySheet";
 import { BEGIN_EVENT } from "@/components/Welcome";
 import { GUEST_TOUR, MEMBER_TOUR, PRACTICES_SEEN_KEY, TOUR_KEYS } from "@/lib/tours";
 import { STYLES, type Style } from "@/lib/styles";
@@ -65,6 +66,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [askSignIn, setAskSignIn] = useState(false);
   const [calmOpen, setCalmOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const [exercise, setExercise] = useState<Open>(null);
   const [tour, setTour] = useState<"guest" | "member" | null>(null);
   const [practicesSeen, setPracticesSeen] = useState(true);
@@ -467,6 +469,13 @@ export default function Home() {
               </button>
             )}
             <button
+              onClick={() => setPrivacyOpen(true)}
+              className="hidden items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-sm text-muted hover:border-gold hover:text-ink sm:flex"
+              aria-label="Your privacy"
+            >
+              <span aria-hidden="true">🔒</span> Private
+            </button>
+            <button
               onClick={openPractices}
               data-tour="practices"
               className={`glow-gold relative flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm text-ink hover:text-gold ${practicesSeen ? "" : "breathe-gold"}`}
@@ -508,6 +517,12 @@ export default function Home() {
               <p className="mt-2 text-center text-muted">
                 Share what you&apos;re facing. Sarathi responds with the wisdom of the Gita.
               </p>
+              <button
+                onClick={() => setPrivacyOpen(true)}
+                className="mx-auto mt-3 flex items-center gap-1.5 rounded-full border border-gold/30 bg-surface/60 px-3.5 py-1.5 text-sm text-gold hover:border-gold"
+              >
+                <span aria-hidden="true">🔒</span> Just you and Sarathi: private, judgement-free, no consultation fees
+              </button>
 
               <h2 className="mt-8 mb-2 text-sm font-medium text-muted">What is it about?</h2>
               <div className="flex flex-wrap gap-2" data-tour="topics">
@@ -597,6 +612,14 @@ export default function Home() {
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            onClick={() => setPrivacyOpen(true)}
+            data-tour="privacy"
+            className="mb-1.5 flex items-center gap-1.5 text-[12px] text-muted hover:text-ink"
+          >
+            <span aria-hidden="true">🔒</span> Only you can see this. No one is judging.
+          </button>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -652,12 +675,13 @@ export default function Home() {
             <button onClick={startTour} className="underline">
               How Sarathi works
             </button>{" "}
-            <span className="opacity-60">· v3.11</span>
+            <span className="opacity-60">· v3.12</span>
           </p>
         </footer>
       </div>
 
       {exercise && <OpenExercise open={exercise} onClose={() => setExercise(null)} />}
+      {privacyOpen && <PrivacySheet signedIn={Boolean(profile?.consented_at)} onClose={() => setPrivacyOpen(false)} />}
       {tour && <Tour steps={tour === "member" ? MEMBER_TOUR : GUEST_TOUR} onDone={endTour} />}
       {calmOpen && <PracticesMenu signedIn={Boolean(profile?.consented_at)} onClose={() => setCalmOpen(false)} />}
       {askSignIn && (
